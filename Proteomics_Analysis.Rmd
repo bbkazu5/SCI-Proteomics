@@ -1,0 +1,1639 @@
+---
+title: "Proteomics Analysis SCI & SHAM"
+author: "Brendan K. Ball"
+date: "2025-02-17"
+output: html_document
+---
+
+# 1. PACKAGES IMPORT
+```{r Import Required Packages}
+# Downloads and calls from the library the necessary packages needed to run the code
+if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (stringr, verbose = FALSE))
+if(!require(gtools)) install.packages("gtools", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (gtools, verbose = FALSE))
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (dplyr, verbose = FALSE))
+if(!require(factoextra)) install.packages("factoextra", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (factoextra, verbose = FALSE))
+if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (devtools, verbose = FALSE))
+if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (data.table, verbose = FALSE))
+if(!require(tibble)) install.packages("tibble", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tibble, verbose = FALSE))
+if(!require(lme4)) install.packages("lme4", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (lme4, verbose = FALSE))
+if(!require(emmeans)) install.packages("emmeans", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (emmeans, verbose = FALSE))
+if(!require(effects)) install.packages("effects", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (effects, verbose = FALSE))
+if(!require(ggforce)) install.packages("ggforce", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (ggforce, verbose = FALSE))
+if(!require(pheatmap)) install.packages("pheatmap", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (pheatmap, verbose = FALSE))
+if (!requireNamespace('BiocManager', quietly = TRUE))
+  install.packages('BiocManager')
+if(!require(EnhancedVolcano)) install.packages("EnhancedVolcano", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (EnhancedVolcano, verbose = FALSE)) # Imported using BiocManager::install("EnhancedVolcano")
+if(!require(GEOquery)) install.packages("GEOquery", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (GEOquery, verbose = FALSE)) # Imported using BiocManager::install("GEOquery")
+if(!require(orthogene)) install.packages("orthogene", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (orthogene, verbose = FALSE)) # Imported using BiocManager::install("orthogene")
+if(!require(limma)) install.packages("limma", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (limma, verbose = FALSE))
+if(!require(umap)) install.packages("umap", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (umap, verbose = FALSE))
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (dplyr, verbose = FALSE))
+if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (stringr, verbose = FALSE))
+if(!require(powerjoin)) install.packages("powerjoin", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (powerjoin, verbose = FALSE))
+if(!require(tidyr)) install.packages("tidyr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tidyr, verbose = FALSE))
+if(!require(purrr)) install.packages("purrr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (purrr, verbose = FALSE))
+if(!require(fgsea)) install.packages("fgsea", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (fgsea, verbose = FALSE)) # Imported using BiocManager::install("fgsea")
+if(!require(glmnet)) install.packages("glmnet", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (glmnet, verbose = FALSE))
+if(!require(mixOmics)) install.packages("mixOmics", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (mixOmics, verbose = FALSE)) # Imported using BiocManager::install("mixOmics")
+if(!require(org.Hs.eg.db)) install.packages("org.Hs.eg.db", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (org.Hs.eg.db, verbose = FALSE)) # Imported using BiocManager::install("org.Hs.eg.db")
+if(!require(clusterProfiler)) install.packages("clusterProfiler", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (clusterProfiler, verbose = FALSE)) # Imported using BiocManager::install("clusterProfiler")
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tidyverse, verbose = FALSE))
+if(!require(orthogene)) install.packages("orthogene", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (orthogene, verbose = FALSE))
+if(!require(dittoSeq)) install.packages("dittoSeq", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (dittoSeq, verbose = FALSE)) # Imported using BiocManager::install("EnhancedVolcano")
+if(!require(openxlsx)) install.packages("openxlsx", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (openxlsx, verbose = FALSE))
+if(!require(EnrichmentBrowser)) install.packages("EnrichmentBrowser", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (EnrichmentBrowser, verbose = FALSE)) # Imported using BiocManager::install("EnrichmentBrowser")
+if(!require(qusage)) install.packages("qusage", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (qusage, verbose = FALSE)) # Imported using BiocManager::install("qusage")
+if(!require(ggpubr)) install.packages("ggpubr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (ggpubr, verbose = FALSE))
+if(!require(writexl)) install.packages("writexl", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (writexl, verbose = FALSE))
+if (!require("msigdbr")) {BiocManager::install("msigdbr")}
+suppressWarnings(library (msigdbr, verbose = FALSE))
+if(!require(reshape2)) install.packages("reshape2", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (reshape2, verbose = FALSE))
+if (!require("AnnotationDbi")) {BiocManager::install("AnnotationDbi")}
+suppressWarnings(library (AnnotationDbi, verbose = FALSE))
+if(!require(ggraph)) install.packages("ggraph", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (ggraph, verbose = FALSE))
+if(!require(igraph)) install.packages("igraph", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (igraph, verbose = FALSE))
+if(!require(tidygraph)) install.packages("tidygraph", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tidygraph, verbose = FALSE))
+if(!require(org.Rn.eg.db)) install.packages("org.Rn.eg.db", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (org.Rn.eg.db, verbose = FALSE)) # Imported using BiocManager::install("org.Rn.eg.db")
+if(!require(VennDiagram)) install.packages("VennDiagram", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (VennDiagram, verbose = FALSE))
+suppressWarnings(library (sva, verbose = FALSE)) # Imported using BiocManager::install("sva")
+if(!require(VIM)) install.packages("VIM", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (VIM, verbose = FALSE)) .
+if(!require(ComplexHeatmap)) install.packages("ComplexHeatmap", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (ComplexHeatmap, verbose = FALSE)) .
+if(!require(circlize)) install.packages("circlize", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (circlize, verbose = FALSE)) .
+```
+
+# 2. DATA IMPORT OF FILES
+```{r Data Import}
+# Import proteomics values
+prot_dat <- read.csv("Proteomics_Exploris_Dat.csv")
+prot_dat2 <- read.csv("PPF_Rachel_0_138_results.csv")
+```
+
+# 3. DATA PRE-PROCESSING
+## 3.1. Preparation & Pre-Processing
+```{r Data Preparation}
+# Batch 1 data
+# Remove column in data
+prot_dat <- prot_dat %>% dplyr::select(-X236)
+# Rename the columns to respective conditions
+colnames(prot_dat)[3] <- "SHAM_1"
+colnames(prot_dat)[4] <- "SCI_1"
+colnames(prot_dat)[5] <- "SHAM_2"
+colnames(prot_dat)[6] <- "SCI_2"
+colnames(prot_dat)[7] <- "SCI_3"
+colnames(prot_dat)[8] <- "SHAM_3"
+# Make data frame numeric
+for (i in 3:ncol(prot_dat)) {
+  prot_dat[,i] <- as.numeric(prot_dat[,i])
+}
+# Reorder the data frame to the consistent labeling
+prot_dat <- prot_dat[, c("Accession", "Description", "SCI_1", "SCI_2", "SCI_3", "SHAM_1", "SHAM_2", "SHAM_3")]
+# Remove the Rn labeling in the protein description
+prot_dat$Description <- gsub(" \\[OS=Rattus norvegicus\\]", "", prot_dat$Description)
+# Rename descriptors
+colnames(prot_dat)[1] <- "UniprotID"
+colnames(prot_dat)[2] <- "Protein"
+# Remove the Rn labeling in the protein description
+prot_dat2$Description <- gsub(" \\[OS=Rattus norvegicus\\]", "", prot_dat2$Description)
+# Rename descriptors
+colnames(prot_dat2)[1] <- "UniprotID"
+colnames(prot_dat2)[2] <- "Protein"
+
+# Batch 2 data
+# Pre-processing the data
+prot_dat2 <- prot_dat2[,colSums(is.na(prot_dat2))<nrow(prot_dat2)]
+# Remove the first row due to being additional header
+prot_dat2 <- prot_dat2[-1,]
+# Rename the columns
+colnames(prot_dat2)[3] <- "SCI_4"
+colnames(prot_dat2)[4] <- "SCI_5"
+colnames(prot_dat2)[5] <- "SCI_6"
+colnames(prot_dat2)[6] <- "SHAM_4"
+colnames(prot_dat2)[7] <- "SHAM_5"
+colnames(prot_dat2)[8] <- "SHAM_6"
+colnames(prot_dat2)[9] <- "SHAM_7"
+# Make data frame numeric
+for (i in 3:ncol(prot_dat2)) {
+  prot_dat2[,i] <- as.numeric(prot_dat2[,i])
+}
+```
+
+```{r Data Normalization and Transformation}
+# Check for number of NA in each data sample
+na_counts1 <- colSums(is.na(prot_dat))
+na_counts2 <- colSums(is.na(prot_dat2))
+# Filter out and remove SCI_5 due to extremely high number of missing data (>50%)
+prot_dat2 <- prot_dat2[, -4]
+colnames(prot_dat2)[4] <- "SCI_5"
+
+# Data removal if missing 50% or more entries in a given row
+# Missing more than half of the information in a row (>3), remove
+prot_dat_NA <- prot_dat[rowSums(is.na(prot_dat)) < 3, ]
+prot_dat <- prot_dat_NA
+# Missing more than a half of the information in a row (>3), remove
+prot_dat2_NA <- prot_dat2[rowSums(is.na(prot_dat2)) < 3, ]
+prot_dat2 <- prot_dat2_NA
+
+# log2 transform the abundance values
+prot_dat[, 3:8] <- log2(prot_dat[,3:8])
+prot_dat2[, 3:8] <- log2(prot_dat2[,3:8])
+# Quantile normalize the batches separately
+prot_dat[, 3:8] <- as.data.frame(normalizeBetweenArrays(prot_dat[, 3:8], "quantile"))
+prot_dat2[, 3:8] <- as.data.frame(normalizeBetweenArrays(prot_dat2[, 3:8], "quantile"))
+```
+
+## 3.2. Missing Data in Batch 1 and Batch 2
+```{r Visualizing Missing Data}
+# Prepare as separate dataframe variable for quantification
+prot_dat_vis <- prot_dat
+prot_dat2_vis <- prot_dat2
+# Replace missing values with 0
+prot_dat_vis <- prot_dat_vis %>% mutate_all(~replace(., is.na(.), 0))
+prot_dat2_vis <- prot_dat2_vis %>% mutate_all(~replace(., is.na(.), 0))
+# Data cleaning for heatmap preparation
+prot_dat_heatmap <- prot_dat_vis[(-c(1:2))]
+rownames(prot_dat_heatmap) <- prot_dat_vis$UniprotID
+prot_dat_heatmap <- ifelse(prot_dat_heatmap == 0, 0, 1)
+
+# Batch 1
+#svg('Batch1_MissingData.svg', width = 3, height = 3)
+# Generate the heat map
+heatmapfig_protdat1 <- pheatmap(prot_dat_heatmap,
+  cluster_rows = F,
+  cluster_cols = F,
+  color = colorRampPalette(c("#fee820", "#450055"))(100),
+  border_color = "black",
+  breaks = seq(0, 1, length.out = 100),
+  angle_col = 90,
+  fontsize_col = 3,
+  fontsize_row = 3,
+)
+#dev.off()
+
+# Batch 2
+# Data cleaning for heatmap preparation
+prot_dat2_heatmap <- prot_dat2_vis[(-c(1:2))]
+rownames(prot_dat2_heatmap) <- prot_dat2_vis$UniprotID
+prot_dat2_heatmap <- ifelse(prot_dat2_heatmap == 0, 0, 1)
+
+#svg('Batch2_MissingData.svg', width = 3, height = 3)
+# Generate the heat map
+heatmapfig_protdat2 <- pheatmap(prot_dat2_heatmap,
+  cluster_rows = F,
+  cluster_cols = F,
+  color = colorRampPalette(c("#fee820", "#450055"))(100),
+  border_color = "black",
+  breaks = seq(0, 1, length.out = 100),
+  angle_col = 90,
+  fontsize_col = 3,
+  fontsize_row = 3,
+)
+#dev.off()
+```
+
+## 3.3. Data Imputation and Data Distribution
+```{r Batch 1 and 2 Imputation}
+# Imputation using KNN (BATCH 1)
+prot_dat_imp1 <- kNN(prot_dat, variable=c("SCI_1", "SCI_2", "SCI_3", "SHAM_1", "SHAM_2", "SHAM_3"), k=3)
+
+# Imputation using KNN (BATCH 2)
+prot_dat_imp2 <- kNN(prot_dat2, variable=c("SCI_4", "SCI_5", "SHAM_4", "SHAM_5", "SHAM_6", "SHAM_7"), k=3)
+
+# Summarize the data imputation via KNN with k=3
+#summary(prot_dat_imp1)
+#summary(prot_dat_imp2)
+```
+
+```{r Plot of Distribution Before and After KNN Imputation Batch 1 & 2}
+# Batch 1
+# Convert original data to long format
+prot_dat_long <- prot_dat %>%
+  pivot_longer(cols = 3:8, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Original")
+# Convert imputed data to long format
+prot_dat_imp1_long <- prot_dat_imp1 %>%
+  pivot_longer(cols = 3:8, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Imputed")
+# Combine both datasets
+combined_data <- bind_rows(prot_dat_long, prot_dat_imp1_long)
+combined_data <- combined_data %>% drop_na(Expression)
+
+# Plot density distribution
+#svg('Batch1_KNNdistribution.svg', width = 3, height = 3)
+ggplot(combined_data, aes(x = Expression, fill = DataType)) +
+  geom_density(alpha = 0.5) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Protein Expression", y = "Density") +
+  scale_fill_manual(values = c("Original" = "blue", "Imputed" = "red")) + 
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 0.15), expand = c(0, 0))
+#dev.off()
+
+# Batch 2
+# Convert original data to long format
+prot_dat2_long <- prot_dat2 %>%
+  pivot_longer(cols = 3:8, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Original")
+# Convert imputed data to long format
+prot_dat_imp2_long <- prot_dat_imp2 %>%
+  pivot_longer(cols = 3:8, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Imputed")
+# Combine both datasets
+combined_data2 <- bind_rows(prot_dat2_long, prot_dat_imp2_long)
+combined_data2 <- combined_data2 %>% drop_na(Expression)
+
+# Plot density distribution
+#svg('Batch2_KNNdistribution.svg', width = 3, height = 3)
+ggplot(combined_data2, aes(x = Expression, fill = DataType)) +
+  geom_density(alpha = 0.5) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Protein Expression", y = "Density") +
+  scale_fill_manual(values = c("Original" = "blue", "Imputed" = "red")) +
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 0.15), expand = c(0, 0))
+#dev.off()
+```
+
+# 4. DATA MERGING AND BATCH EFFECT CORRECTION
+## 4.1. Merge Batch 1 and Batch 2
+```{r Data Merging}
+# Pull the imputed data only for both batch 1 and 2
+prot_dat_imp1_norm <- prot_dat_imp1[, 1:8]
+prot_dat_imp2_norm <- prot_dat_imp2[, 1:8]
+# Merge the two batches together
+combined_prot_dat <- merge(prot_dat_imp1_norm, prot_dat_imp2_norm, by = "UniprotID", all = TRUE)
+# Remove the extra column
+combined_prot_dat <- combined_prot_dat[,-9]
+colnames(combined_prot_dat)[2] <- "Protein"
+# Save the pre-NA removed data frame
+old_combined_prot_dat <- combined_prot_dat
+# Remove any rows with a missing data entry
+combined_prot_dat <- na.omit(combined_prot_dat)
+# Calculate percent of proteins lost due to removing missing entries
+percent_prot_lost <- (( nrow(old_combined_prot_dat) - nrow(combined_prot_dat) ) / nrow(old_combined_prot_dat) )*100
+
+# Pull out desired columns
+combined_prot_dat_filt_t <- combined_prot_dat %>% select(UniprotID, SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Move the first column as row name
+rownames(combined_prot_dat_filt_t) <- combined_prot_dat_filt_t[[1]]
+combined_prot_dat_filt_t <- combined_prot_dat_filt_t[-1]   
+# Take the transpose
+combined_prot_dat_filt_t <- t(combined_prot_dat_filt_t)
+# Move the row name back to first column
+combined_prot_dat_filt_t <- as.data.frame(combined_prot_dat_filt_t)
+combined_prot_dat_filt_t <- rownames_to_column(combined_prot_dat_filt_t, var = "Condition")
+# Remove the replicate number to keep only the group
+combined_prot_dat_filt_t$Condition <- gsub("_\\d+", "", combined_prot_dat_filt_t$Condition)
+```
+
+## 4.2. Principal Component Analysis and Batch Correction
+```{r PCA Plot (Uncorrected for Batch Effect)}
+# Prepare the principal components
+protdat_pr <- prcomp(combined_prot_dat_filt_t[c(2:ncol(combined_prot_dat_filt_t))], center = TRUE, scale = FALSE)
+
+#svg('PCA_uncorrected.svg', width = 4, height = 4)
+# Create PCA chart with coloring/grouping based on different rat groups
+g1 <- fviz_pca_ind(protdat_pr, 
+                   label="none", 
+                   alpha.ind=1, 
+                   pointshape=19, 
+                   habillage=combined_prot_dat_filt_t$Condition, 
+                   pointsize = 2, 
+                   repel = TRUE, 
+                   col.ind = "black", 
+                   invisible="quali",
+                   legend.title = "Disease Status",
+                   palette = c("#d73027","#4575b4"))
+g1 +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),  # Remove major gridlines
+        panel.grid.minor = element_blank(),   # Remove minor gridlines
+        aspect.ratio=1
+       )
+#dev.off()
+
+# Defining the batches based on variables from the prior data frame (defined ordering will differ from the below labeling)
+batch_label <- c(rep("Batch 1", 3), rep("Batch 2", 2), rep("Batch 1", 3), rep("Batch 2", 4))
+
+# Create PCA chart with coloring on rat batches
+g2 <- fviz_pca_ind(protdat_pr, 
+                   label="none", 
+                   alpha.ind=1, 
+                   pointshape=19, 
+                   habillage=batch_label,
+                   pointsize = 2, 
+                   repel = TRUE, 
+                   col.ind = "black", 
+                   invisible="quali",
+                   legend.title = "Batch Group",
+                   palette = c("#253494","#a1dab4"))
+g2 +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),  # Remove major gridlines
+        panel.grid.minor = element_blank(),   # Remove minor gridlines
+        aspect.ratio=1
+       )
+```
+
+```{r Batch Correction}
+# Batch correction using the package removeBatchEffect()
+# Pull abundance values only
+batchdata <- combined_prot_dat[c(3:14)]
+# Move UniprotID to rowname
+rownames(batchdata) <- combined_prot_dat$UniprotID
+# Convert to matrix
+batchdata <- as.matrix(batchdata)
+# Label batches by batch 1 and batch 2
+batch_label <- c(rep(1, 6), rep(2, 6))
+batch_label <- as.factor(batch_label)
+# Label the groups associated in the batch
+group <- factor(c("SCI", "SCI", "SCI", "SHAM", "SHAM", "SHAM", "SCI", "SCI", "SHAM", "SHAM", "SHAM", "SHAM"))
+# Prepare as matrix
+design_label <- model.matrix(~group)
+# Batch correction
+prot_dat_corrected <- removeBatchEffect(batchdata, batch=batch_label, design = design_label)
+# Set to data frame and preparation
+prot_dat_corrected <- as.data.frame(prot_dat_corrected)
+prot_dat_corrected_t <- as.data.frame(t(prot_dat_corrected))
+prot_dat_corrected_t <- rownames_to_column(prot_dat_corrected_t, var = "Condition")
+# Remove the replicate number to keep only the group
+prot_dat_corrected_t$Condition <- gsub("_\\d+", "", prot_dat_corrected_t$Condition)
+```
+
+```{r PCA Plot (Corrected for Batch Effect)}
+# Prepare the principal components
+corrected_protdat_pr <- prcomp(prot_dat_corrected_t[c(2:ncol(prot_dat_corrected_t))], center = TRUE, scale = FALSE)
+
+#svg('PCA_corrected.svg', width = 4, height = 4)
+# Create PCA chart with coloring/grouping based on different rat groups
+g1 <- fviz_pca_ind(corrected_protdat_pr, 
+                   label="none", 
+                   alpha.ind=1, 
+                   pointshape=19, 
+                   habillage=prot_dat_corrected_t$Condition, 
+                   pointsize = 2, 
+                   repel = TRUE, 
+                   col.ind = "black", 
+                   invisible="quali",
+                   legend.title = "Disease Status",
+                   palette = c("#d73027","#4575b4"))
+g1 +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),  # Remove major gridlines
+        panel.grid.minor = element_blank(),   # Remove minor gridlines
+        aspect.ratio=1
+       )
+#dev.off()
+
+# Defining the batches based on variables from the prior data frame (defined ordering will differ from the prior labeling due to ordering of the group)
+batch_label <- c(rep("Batch 1", 6), rep("Batch 2", 6))
+
+# Create PCA chart with coloring on rat batches
+g2 <- fviz_pca_ind(corrected_protdat_pr, 
+                   label="none", 
+                   alpha.ind=1, 
+                   pointshape=19, 
+                   habillage=batch_label,
+                   pointsize = 2, 
+                   repel = TRUE, 
+                   col.ind = "black", 
+                   invisible="quali",
+                   legend.title = "Batch Group",
+                   palette = c("#253494","#a1dab4"))
+g2 +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),  # Remove major gridlines
+        panel.grid.minor = element_blank(),   # Remove minor gridlines
+        aspect.ratio=1
+       )
+```
+
+## 4.3. Correlation Analysis to Verify Batch Correction (SCI)
+```{r Spearman Correlation on Pre and Post SCI Sample Batches}
+# Pre-Batch Corrected
+prebatch_SCI_corr <- combined_prot_dat
+# Calculate batch-wise means
+prebatch_SCI_corr$Batch1_mean <- rowMeans(prebatch_SCI_corr[, c("SCI_1", "SCI_2", "SCI_3")], na.rm = TRUE)
+prebatch_SCI_corr$Batch2_mean <- rowMeans(prebatch_SCI_corr[, c("SCI_4", "SCI_5")], na.rm = TRUE)
+# Compute Spearman correlation
+prebatch_SCIspearman_corr <- cor.test(prebatch_SCI_corr$Batch1_mean, prebatch_SCI_corr$Batch2_mean, method = "spearman")
+
+# Scatter plot
+#svg('SCIcorr_prebatch.svg', width = 4, height = 4)
+ggplot(prebatch_SCI_corr, aes(x = Batch1_mean, y = Batch2_mean)) +
+  geom_point(alpha = 1) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = paste("Pre-Correct Spearman Correlation: rho =", round(prebatch_SCIspearman_corr$estimate, 3)),
+       x = "Batch 1 Mean Expression",
+       y = "Batch 2 Mean Expression") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1)
+#dev.off()
+
+# Batch Corrected
+postbatch_SCI_corr <- prot_dat_corrected
+# Calculate batch-wise means
+postbatch_SCI_corr$Batch1_mean <- rowMeans(postbatch_SCI_corr[, c("SCI_1", "SCI_2", "SCI_3")], na.rm = TRUE)
+postbatch_SCI_corr$Batch2_mean <- rowMeans(postbatch_SCI_corr[, c("SCI_4", "SCI_5")], na.rm = TRUE)
+# Compute Spearman correlation
+postbatch_SCIspearman_corr <- cor.test(postbatch_SCI_corr$Batch1_mean, postbatch_SCI_corr$Batch2_mean, method = "spearman")
+
+# Scatter plot
+#svg('SCIcorr_postbatch.svg', width = 4, height = 4)
+ggplot(postbatch_SCI_corr, aes(x = Batch1_mean, y = Batch2_mean)) +
+  geom_point(alpha = 1) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = paste("Post-Correct Spearman Correlation: rho =", round(postbatch_SCIspearman_corr$estimate, 3)),
+       x = "Batch 1 Mean Expression",
+       y = "Batch 2 Mean Expression") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1)
+#dev.off()
+```
+
+## 4.4. Correlation Analysis to Verify Batch Correction (SHAM)
+```{r Spearman Correlation on Pre and Post SHAM Sample Batches}
+# Pre-Batch Corrected
+prebatch_SHAM_corr <- combined_prot_dat
+# Calculate batch-wise means
+prebatch_SHAM_corr$Batch1_mean <- rowMeans(prebatch_SHAM_corr[, c("SHAM_1", "SHAM_2", "SHAM_3")], na.rm = TRUE)
+prebatch_SHAM_corr$Batch2_mean <- rowMeans(prebatch_SHAM_corr[, c("SHAM_4", "SHAM_5", "SHAM_6", "SHAM_7")], na.rm = TRUE)
+# Compute Spearman correlation
+prebatch_SHAMspearman_corr <- cor.test(prebatch_SHAM_corr$Batch1_mean, prebatch_SHAM_corr$Batch2_mean, method = "spearman")
+
+# Scatter plot
+#svg('SHAMcorr_prebatch.svg', width = 4, height = 4)
+ggplot(prebatch_SHAM_corr, aes(x = Batch1_mean, y = Batch2_mean)) +
+  geom_point(alpha = 1) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = paste("Spearman Correlation: rho =", round(prebatch_SHAMspearman_corr$estimate, 3)),
+       x = "Batch 1 Mean Expression",
+       y = "Batch 2 Mean Expression") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1)
+#dev.off()
+
+# Post-Batch Corrected
+postbatch_SHAM_corr <- prot_dat_corrected
+# Calculate batch-wise means
+postbatch_SHAM_corr$Batch1_mean <- rowMeans(postbatch_SHAM_corr[, c("SHAM_1", "SHAM_2", "SHAM_3")], na.rm = TRUE)
+postbatch_SHAM_corr$Batch2_mean <- rowMeans(postbatch_SHAM_corr[, c("SHAM_4", "SHAM_5", "SHAM_6", "SHAM_7")], na.rm = TRUE)
+# Compute Spearman correlation
+postbatch_SHAMspearman_corr <- cor.test(postbatch_SHAM_corr$Batch1_mean, postbatch_SHAM_corr$Batch2_mean, method = "spearman")
+
+# Scatter plot
+#svg('SHAMcorr_postbatch.svg', width = 4, height = 4)
+ggplot(postbatch_SHAM_corr, aes(x = Batch1_mean, y = Batch2_mean)) +
+  geom_point(alpha = 1) +
+  geom_smooth(method = "lm", color = "blue", se = FALSE) +
+  labs(title = paste("Spearman Correlation: rho =", round(postbatch_SHAMspearman_corr$estimate, 3)),
+       x = "Batch 1 Mean Expression",
+       y = "Batch 2 Mean Expression") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1)
+#dev.off()
+```
+
+# 5. DIFFERENTIALLY ABUNDANT PROTEIN ANALYSIS
+## 5.1. Volcano Plot
+```{r Differentially Abundant Protein Analysis}
+# Move row names to first column
+prot_dat_bc <- rownames_to_column(prot_dat_corrected, var = "UniprotID")
+# Reorder the dataset
+prot_dat_bc <- prot_dat_bc %>% select(UniprotID, SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+
+# Save file as XLSX
+#write.xlsx(prot_dat_bc, "Postcorrected_list.xlsx")
+
+# Set UniprotID as row names
+rownames(prot_dat_bc) <- prot_dat_bc$UniprotID
+prot_dat_bc <- prot_dat_bc[,-1]  # Remove UniprotID column
+# Define conditions
+condition <- c(rep("SCI", 5), rep("SHAM", 7))
+design <- model.matrix(~0 + condition)
+colnames(design) <- c("SCI", "SHAM")
+# Create contrast matrix
+contrast.matrix <- makeContrasts(SCI_vs_SHAM = SCI - SHAM, levels = design)
+# Run limma analysis
+fit <- lmFit(prot_dat_bc, design, method="robust", maxit=300)
+fit <- contrasts.fit(fit, contrast.matrix)
+fit <- eBayes(fit)
+# Get results
+results <- topTable(fit, coef="SCI_vs_SHAM", number=Inf, adjust.method="BH")
+results$UniprotID <- rownames(results)
+
+# Volcano plot
+#svg('volcanoplot.svg', width = 4, height = 4)
+ggplot(results, aes(x = logFC, y = -log10(adj.P.Val))) +
+  geom_point(aes(color = factor(ifelse(adj.P.Val < 0.05 & abs(logFC) > 1, "Significant & FC",
+                                     ifelse(adj.P.Val < 0.05 & abs(logFC) <= 1, "Significant",           "NS")))), 
+             alpha = 1, size=0.5) +
+  scale_color_manual(values = c("NS" = "black", 
+                                "Significant & FC" = "red", 
+                                "Significant" = "blue")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") + 
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  labs(x = "Log2FC", 
+       y = "-Log10 Padj", 
+       color = "Legend") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  scale_y_continuous(limits = c(0, 4.5), expand = c(0, 0))
+#dev.off()
+```
+
+## 5.2. Annotated Volcano Plot with Protein Labels
+```{r Volcano Plot Labeling for Significant Proteins}
+# Define significance criteria
+results$Significant <- results$adj.P.Val < 0.05 & abs(results$logFC) > 1
+
+# Plot for reference
+ggplot(results, aes(x = logFC, y = -log10(adj.P.Val))) +
+  geom_point(aes(color = factor(ifelse(adj.P.Val < 0.05 & abs(logFC) > 1, "Significant & FC",
+                                     ifelse(adj.P.Val < 0.05 & abs(logFC) <= 1, "Significant", "NS")))), 
+             alpha = 1) +
+  scale_color_manual(values = c("NS" = "black", 
+                                "Significant & FC" = "red", 
+                                "Significant" = "blue")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") + 
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  labs(x = "Log2FC", 
+       y = "-Log10 Padj", 
+       color = "Legend") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  scale_y_continuous(limits = c(0, 5), expand = c(0, 0)) +
+  geom_text_repel(data = subset(results, adj.P.Val < 0.05 & abs(logFC) > 1),
+                  aes(label = UniprotID),
+                  size = 2, box.padding = 0.5, max.overlaps = 30)
+```
+
+```{r Save Processed File}
+# Prepare protein and uniprotID list conversion
+protein_list <- combined_prot_dat[c("UniprotID", "Protein")]
+# Merge data with respective label
+prot_dat_bc_label <- merge(results, protein_list, by = "UniprotID", all = TRUE)
+# Move Protein label after UniprotID
+prot_dat_bc_label <- prot_dat_bc_label %>% 
+  relocate(Protein, .after = UniprotID)
+# Save file as XLSX
+#write.xlsx(prot_dat_bc_label, "DAP_SCIvSHAMproteomics_list.xlsx")
+
+# Saving the processed samples
+#prot_dat_bc_file <- rownames_to_column(prot_dat_bc, var = "UniprotID")
+#write.xlsx(prot_dat_bc_file, "DAP_SCIvSHAMprocessed_samples.xlsx", rownames=TRUE)
+```
+
+# 6. HIERARCHICAL CLUSTERING ANALYSIS VIA HEATMAP
+## 6.1. Unfiltered Heatmap
+```{r Heatmap Figure - Overall}
+# Data cleaning for heatmap preparation
+prot_dat_heatmap <- prot_dat_bc
+# Transpose to perform z-score normalization
+prot_dat_heatmap_t <- as.data.frame(t(prot_dat_heatmap))
+# Function to calculate z-score for a vector
+calc_z_score <- function(x) {
+  (x - mean(x)) / sd(x)
+}
+# Loop through each column and apply the z-score transformation
+for (i in 1:ncol(prot_dat_heatmap_t)) {
+  prot_dat_heatmap_t[,i] <- calc_z_score(prot_dat_heatmap_t[,i])
+}
+# Revert to original transpose
+prot_dat_heatmap <- as.data.frame(t(prot_dat_heatmap_t))
+# Reorder the heatmap with SCI and SHAM ordering
+prot_dat_heatmap <-prot_dat_heatmap[, c("SCI_1", "SCI_2", "SCI_3", "SCI_4", "SCI_5", "SHAM_1", "SHAM_2", "SHAM_3", "SHAM_4", "SHAM_5", "SHAM_6", "SHAM_7")]
+
+#svg('heatmap_sham_SCI.svg', width = 3, height = 4)
+# Generate the heat map
+heatmapfig_PC2 <- pheatmap(prot_dat_heatmap,
+  cluster_rows = T,
+  cluster_cols = T,
+  color = colorRampPalette(c("#4575b4", "white", "#d73027"))(100),
+  border_color = "black",
+  breaks = seq(-2.5, 2.5, length.out = 100),
+  angle_col = 90,
+  fontsize_col = 3,
+  fontsize_row = 3,
+)
+#dev.off()
+```
+
+## 6.2. Filtered Heatmap (p adj < 0.05, logFC > |1|)
+```{r Heatmap Figure - Significant Proteins 1}
+# Move rownames to the first column
+prot_dat_bc2 <- rownames_to_column(prot_dat_bc, var = "UniprotID")
+# Merge the samples data with the statistics from limma
+prot_dat_bc_merge <- merge(prot_dat_bc_label, prot_dat_bc2, by = "UniprotID", all = TRUE)
+# Reorder columns such that samples are after the Protein name column
+prot_dat_list_stats <- prot_dat_bc_merge %>%
+  relocate(all_of(colnames(prot_dat_bc_merge)[10:21]), .after = Protein) 
+
+# Prepare new variable name for the heatmap
+prot_dat_heatmap_filt <- prot_dat_list_stats
+# Replace samples with the z-score values
+prot_dat_heatmap_filt[,3:14] <- prot_dat_heatmap
+# Filter the data by p adj < 0.05 ad logFC > |1|
+prot_dat_heatmap_filt2 <- prot_dat_heatmap_filt %>%
+  filter(adj.P.Val < 0.05, abs(logFC) > 1)
+
+# Organize presented order of the variables in the heatmap
+prot_dat_heatmap_plot2 <- prot_dat_heatmap_filt2[, c("UniprotID", "SCI_1", "SCI_2", "SCI_3", "SCI_4", "SCI_5", "SHAM_1", "SHAM_2", "SHAM_3", "SHAM_4", "SHAM_5", "SHAM_6", "SHAM_7")]
+prot_dat_heatmap_plot2 <- prot_dat_heatmap_plot2 %>%
+  column_to_rownames(var = colnames(prot_dat_heatmap_plot2)[1])
+
+#svg('heatmap_sham_SCI_filt1.svg', width = 3, height = 4)
+# Generate the heat map
+heatmapfig_PC2 <- pheatmap(prot_dat_heatmap_plot2,
+  cluster_rows = T,
+  cluster_cols = T,
+  color = colorRampPalette(c("#4575b4", "white", "#d73027"))(100),
+  border_color = "black",
+  breaks = seq(-2.5, 2.5, length.out = 100),
+  angle_col = 90,
+  fontsize_col = 3,
+  fontsize_row = 3,
+)
+#dev.off()
+
+# Saving the filtered list of significant and log2FC list of proteins
+#write.xlsx(prot_dat_heatmap_filt2, "STRINGDB_list_PPI_list.xlsx", rownames=TRUE)
+```
+
+```{r Heatmap Figure - Significant Proteins 2}
+# Filter the data by p adj < 0.05 ad logFC > |1.5|
+prot_dat_heatmap_filt3 <- prot_dat_heatmap_filt %>%
+  filter(adj.P.Val < 0.05, abs(logFC) > 1.5)
+# Organize presented order of the variables in the heatmap
+prot_dat_heatmap_plot3 <- prot_dat_heatmap_filt3[, c("UniprotID", "SCI_1", "SCI_2", "SCI_3", "SCI_4", "SCI_5", "SHAM_1", "SHAM_2", "SHAM_3", "SHAM_4", "SHAM_5", "SHAM_6", "SHAM_7")]
+prot_dat_heatmap_plot3 <- prot_dat_heatmap_plot3 %>%
+  column_to_rownames(var = colnames(prot_dat_heatmap_plot3)[1])
+
+#svg('heatmap_sham_SCI_filt2.svg', width = 3, height = 4)
+# Generate the heat map
+heatmapfig_PC2 <- pheatmap(prot_dat_heatmap_plot3,
+  cluster_rows = T,
+  cluster_cols = T,
+  color = colorRampPalette(c("#4575b4", "white", "#d73027"))(100),
+  border_color = "black",
+  breaks = seq(-2.5, 2.5, length.out = 100),
+  angle_col = 90,
+  fontsize_col = 3,
+  fontsize_row = 3,
+)
+#dev.off()
+```
+
+# 7. GENE SET ENRICHMENT ANALYSIS
+## 7.1. Protein-to-Gene Mapping and GSEA
+```{r Rat Protein to Gene Mapping}
+# Create separate data frame copy for the GSEA protein-to-gene mapping
+gsea_dat_list_stats <- prot_dat_list_stats
+# Protein to gene mapping (rat gene symbol)
+gsea_dat_list_stats$GeneID <- mapIds(
+  org.Rn.eg.db, 
+  keys = gsea_dat_list_stats$UniprotID, 
+  column = "SYMBOL", 
+  keytype = "UNIPROT", 
+  multiVals = "first"
+)
+# Move GeneID column after UniprotID column
+gsea_dat_list_stats <- gsea_dat_list_stats %>% 
+  relocate(GeneID, .after = UniprotID)
+# Remove NA values
+gsea_dat_list_stats_filt <- gsea_dat_list_stats[!is.na(gsea_dat_list_stats$GeneID), ]
+
+# Save file as XLSX
+#write.xlsx(gsea_dat_list_stats_filt, "gseaprerank_list.xlsx")
+```
+
+## 7.2. Gene Set Enrichment Analysis
+```{r GSEA Reactome}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA (KEGG)
+rn_GSEA_sets <- msigdbr(species = "Rattus norvegicus",
+                        category = "C2", subcategory = "CP:REACTOME"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_GSEA_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+gsea_results_list_reactome <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(gsea_results_list_reactome, "GSEA_Reactome_proteomics.xlsx")
+```
+
+```{r GSEA Hallmark}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA (KEGG)
+rn_GSEA_sets <- msigdbr(species = "Rattus norvegicus",
+                        category = "H"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_GSEA_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+gsea_results_list_hallmark <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(gsea_results_list_hallmark, "GSEA_Hallmark_proteomics.xlsx")
+```
+
+```{r GSEA KEGG}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA (KEGG)
+rn_GSEA_sets <- msigdbr(species = "Rattus norvegicus",
+                        category = "C2", subcategory = "CP:KEGG"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+  
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_GSEA_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+gsea_results_list_kegg <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(gsea_results_list_kegg, "GSEA_KEGG_proteomics.xlsx")
+```
+
+```{r GSEA GO}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA (KEGG)
+rn_GSEA_sets <- msigdbr(species = "Rattus norvegicus",
+                        category = "C5", subcategory = "GO:BP"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_GSEA_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+gsea_results_list_go <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(gsea_results_list_go, "GSEA_GO_proteomics.xlsx")
+```
+
+## 7.3. Gene Set Enrichment Analysis Plots
+```{r Reactome}
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+gsea_results_list_reactome  <- gsea_results_list_reactome [with(gsea_results_list_reactome , !((p.adjust >= 0.05))), ]
+Proc_gsea_results_list_reactome <- gsea_results_list_reactome %>% mutate(sign = NES <= 0)
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(Proc_gsea_results_list_reactome, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Define dynamic range for circle size
+min_circle_size <- 2   # Smallest circle size
+max_circle_size <- 6   # Largest circle size
+fixed_breaks <- c(5, 25, 50, 75, 100)  # Consistent breaks for gene size
+
+#cairo_ps(filename='GSEA_reactome.eps', height = 6, width = 18)
+# Create the GSEA plot
+ggplot(data = Proc_gsea_results_list_reactome, aes(x = NES, y = reorder(Description, NES), size = setSize, color = p.adjust)) +
+  geom_point(alpha = 1) +
+  scale_size_continuous(name = "Set Size",
+        range = c(min_circle_size, max_circle_size), # Map setSize to the size range
+        breaks = fixed_breaks,                      # Consistent breaks for legend
+        labels = fixed_breaks                       # Consistent labels for legend
+                 ) +
+  scale_color_gradient(name = "adj p-value",
+                       low = "#bd0026",
+                       high = "#ffffb2",
+                       limits = c(0, 0.05)   # Scale of color between 0 (low) and 0.05 (high)
+                       ) +
+  labs(x = "Normalized Enrichment Score (NES)",
+       y = NULL
+      ) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_line(color = "black", linewidth = 0.25, linetype = "dotted"),
+        panel.grid.major.x = element_blank(),
+        aspect.ratio = 4
+       ) +
+  xlim(-3, 3) + 
+  geom_vline(xintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5)
+#dev.off()
+```
+
+```{r KEGG}
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+gsea_results_list_kegg  <- gsea_results_list_kegg [with(gsea_results_list_kegg , !((p.adjust >= 0.15))), ] #purposefully set for 0.15 to allow code to run. Will remove Lupus in the figure
+Proc_gsea_results_list_kegg <- gsea_results_list_kegg %>% mutate(sign = NES <= 0)
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(Proc_gsea_results_list_kegg, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Define dynamic range for circle size
+min_circle_size <- 2   # Smallest circle size
+max_circle_size <- 6   # Largest circle size
+fixed_breaks <- c(5, 25, 50, 75, 100)  # Consistent breaks for gene size
+
+#cairo_ps(filename='GSEA_kegg.eps', height = 6, width = 18)
+# Create the GSEA plot
+ggplot(data = Proc_gsea_results_list_kegg, aes(x = NES, y = reorder(Description, NES), size = setSize, color = p.adjust)) +
+  geom_point(alpha = 1) +
+  scale_size_continuous(name = "Set Size",
+        range = c(min_circle_size, max_circle_size), # Map setSize to the size range
+        breaks = fixed_breaks,                      # Consistent breaks for legend
+        labels = fixed_breaks                       # Consistent labels for legend
+                 ) +
+  scale_color_gradient(name = "adj p-value",
+                       low = "#bd0026",
+                       high = "#ffffb2",
+                       limits = c(0, 0.05)   # Scale of color between 0 (low) and 0.05 (high)
+                       ) +
+  labs(x = "Normalized Enrichment Score (NES)",
+       y = NULL
+      ) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_line(color = "black", linewidth = 0.25, linetype = "dotted"),
+        panel.grid.major.x = element_blank(),
+        aspect.ratio = 4
+       ) +
+  xlim(-3, 3) + 
+  geom_vline(xintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5)
+#dev.off()
+```
+
+```{r Hallmark}
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+gsea_results_list_hallmark  <- gsea_results_list_hallmark [with(gsea_results_list_hallmark , !((p.adjust >= 0.05))), ]
+Proc_gsea_results_list_hallmark <- gsea_results_list_hallmark %>% mutate(sign = NES <= 0)
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(Proc_gsea_results_list_hallmark, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Define dynamic range for circle size
+min_circle_size <- 2   # Smallest circle size
+max_circle_size <- 6   # Largest circle size
+fixed_breaks <- c(5, 25, 50, 75, 100)  # Consistent breaks for gene size
+
+#cairo_ps(filename='GSEA_hallmark.eps', height = 6, width = 18)
+# Create the GSEA plot
+ggplot(data = Proc_gsea_results_list_hallmark, aes(x = NES, y = reorder(Description, NES), size = setSize, color = p.adjust)) +
+  geom_point(alpha = 1) +
+  scale_size_continuous(name = "Set Size",
+        range = c(min_circle_size, max_circle_size), # Map setSize to the size range
+        breaks = fixed_breaks,                      # Consistent breaks for legend
+        labels = fixed_breaks                       # Consistent labels for legend
+                 ) +
+  scale_color_gradient(name = "adj p-value",
+                       low = "#bd0026",
+                       high = "#ffffb2",
+                       limits = c(0, 0.05)   # Scale of color between 0 (low) and 0.05 (high)
+                       ) +
+  labs(x = "Normalized Enrichment Score (NES)",
+       y = NULL
+      ) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_line(color = "black", linewidth = 0.25, linetype = "dotted"),
+        panel.grid.major.x = element_blank(),
+        aspect.ratio = 4
+       ) +
+  xlim(-3, 3) + 
+  geom_vline(xintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5)
+#dev.off()
+```
+
+```{r Gene Ontology}
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+gsea_results_list_go  <- gsea_results_list_go [with(gsea_results_list_go , !((p.adjust >= 0.05))), ]
+Proc_gsea_results_list_go <- gsea_results_list_go %>% mutate(sign = NES <= 0)
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(Proc_gsea_results_list_go, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Define dynamic range for circle size
+min_circle_size <- 2   # Smallest circle size
+max_circle_size <- 4   # Largest circle size
+fixed_breaks <- c(5, 25, 50, 75, 100)  # Consistent breaks for gene size
+
+#cairo_ps(filename='GSEA_geneontology.eps', height = 10, width = 18)
+# Create the GSEA plot
+ggplot(data = Proc_gsea_results_list_go, aes(x = NES, y = reorder(Description, NES), size = setSize, color = p.adjust)) +
+  geom_point(alpha = 1) +
+  scale_size_continuous(name = "Set Size",
+        range = c(min_circle_size, max_circle_size), # Map setSize to the size range
+        breaks = fixed_breaks,                      # Consistent breaks for legend
+        labels = fixed_breaks                       # Consistent labels for legend
+                 ) +
+  scale_color_gradient(name = "adj p-value",
+                       low = "#bd0026",
+                       high = "#ffffb2",
+                       limits = c(0, 0.05)   # Scale of color between 0 (low) and 0.05 (high)
+                       ) +
+  labs(x = "Normalized Enrichment Score (NES)",
+       y = NULL
+      ) +
+  theme_bw() +
+  theme(axis.text.y = element_text(size = 10),
+        plot.title = element_text(hjust = 0.5),
+        panel.grid.minor = element_blank(),
+        panel.grid.major.y = element_line(color = "black", linewidth = 0.25, linetype = "dotted"),
+        panel.grid.major.x = element_blank(),
+        aspect.ratio = 4
+       ) +
+  xlim(-3, 3) + 
+  geom_vline(xintercept = 0, color = "black", linetype = "dashed", linewidth = 0.5)
+#dev.off()
+```
+
+```{r Leading Edge Gene Identifier}
+# Function to extract unique leading edge genes from each pathway analysis
+extract_genes <- function(dataframe) {
+  unique(unlist(strsplit(dataframe$core_enrichment, "/")))
+}
+# Extract unique leading edge genes
+genes_kegg <- extract_genes(Proc_gsea_results_list_kegg)
+genes_go <- extract_genes(Proc_gsea_results_list_go)
+genes_reactome <- extract_genes(Proc_gsea_results_list_reactome)
+genes_hallmark <- extract_genes(Proc_gsea_results_list_hallmark)
+# Combine gene lists into a list
+leadingedge_gene_list <- list(
+  KEGG = genes_kegg,
+  GO = genes_go,
+  Reactome = genes_reactome,
+  Hallmark = genes_hallmark
+)
+#write.xlsx(leadingedge_gene_list, "leadingedge_gene_list.xlsx")
+```
+
+# 8. PAIRWISE TESTING ON OVERREPRESENTED GENES FROM GSEA
+```{r Pairwise Plots}
+# The genes include: C3, C9, F12, Fgg, Plg, Serpina1, and Serping1
+#svg('C3_boxwhisk.svg', width = 4, height = 4)
+# Isolate C3
+C3dat <- prot_dat_list_stats[grepl("P01026", prot_dat_list_stats$UniprotID),]
+# Pull out the columns with the abundance values
+C3dat_proc <- C3dat %>% select(SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Prepare data set for box-whisker plot
+C3dat_proc_t <- rownames_to_column( as.data.frame( t(C3dat_proc) ), var="Condition")
+colnames(C3dat_proc_t)[2] <- "Abundance"
+# Remove the numbers indicating the sample size number
+C3dat_proc_t$Condition <- gsub("_\\d+", "", C3dat_proc_t$Condition)
+# Plot the box-whisker pairwise test for C3
+ggplot(C3dat_proc_t, aes(x = Condition, y = Abundance, fill = Condition)) +
+  geom_jitter(shape = 21, width = 0.05, height = 0, size = 2, color = "black") + 
+  geom_bar(stat = "identity", fill = "transparent", color = "transparent") +
+  stat_summary(fun = mean, geom = "errorbar", aes(ymax = after_stat(y), ymin = after_stat(y)), width = 0.2, color = "red") +
+  stat_summary(fun.data = function(y) {
+    data.frame(ymin = quantile(y, 0.25), ymax = quantile(y, 0.75), y = mean(y))
+  }, geom = "errorbar", width = 0.1, color = "red") +
+  coord_cartesian(ylim = c(24, 31)) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Condition", y = "log2 C3 Abundance")
+#dev.off()
+
+#svg('C9_boxwhisk.svg', width = 4, height = 4)
+# Isolate C9
+C9dat <- prot_dat_list_stats[grepl("Q62930", prot_dat_list_stats$UniprotID),]
+# Pull out the columns with the abundance values
+C9dat_proc <- C9dat %>% select(SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Prepare data set for box-whisker plot
+C9dat_proc_t <- rownames_to_column( as.data.frame( t(C9dat_proc) ), var="Condition")
+colnames(C9dat_proc_t)[2] <- "Abundance"
+# Remove the numbers indicating the sample size number
+C9dat_proc_t$Condition <- gsub("_\\d+", "", C9dat_proc_t$Condition)
+# Plot the box-whisker pairwise test for C9
+ggplot(C9dat_proc_t, aes(x = Condition, y = Abundance, fill = Condition)) +
+  geom_jitter(shape = 21, width = 0.05, height = 0, size = 2, color = "black") + 
+  geom_bar(stat = "identity", fill = "transparent", color = "transparent") +
+  stat_summary(fun = mean, geom = "errorbar", aes(ymax = after_stat(y), ymin = after_stat(y)), width = 0.2, color = "red") +
+  stat_summary(fun.data = function(y) {
+    data.frame(ymin = quantile(y, 0.25), ymax = quantile(y, 0.75), y = mean(y))
+  }, geom = "errorbar", width = 0.1, color = "red") +
+  coord_cartesian(ylim = c(17, 28)) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Condition", y = "log2 C9 Abundance")
+#dev.off()
+
+#svg('F12_boxwhisk.svg', width = 4, height = 4)
+# Isolate F12
+F12dat <- prot_dat_list_stats[grepl("D3ZTE0", prot_dat_list_stats$UniprotID),]
+# Pull out the columns with the abundance values
+F12dat_proc <- F12dat %>% select(SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Prepare data set for box-whisker plot
+F12dat_proc_t <- rownames_to_column( as.data.frame( t(F12dat_proc) ), var="Condition")
+colnames(F12dat_proc_t)[2] <- "Abundance"
+# Remove the numbers indicating the sample size number
+F12dat_proc_t$Condition <- gsub("_\\d+", "", F12dat_proc_t$Condition)
+# Plot the box-whisker pairwise test for F12
+ggplot(F12dat_proc_t, aes(x = Condition, y = Abundance, fill = Condition)) +
+  geom_jitter(shape = 21, width = 0.05, height = 0, size = 2, color = "black") + 
+  geom_bar(stat = "identity", fill = "transparent", color = "transparent") +
+  stat_summary(fun = mean, geom = "errorbar", aes(ymax = after_stat(y), ymin = after_stat(y)), width = 0.2, color = "red") +
+  stat_summary(fun.data = function(y) {
+    data.frame(ymin = quantile(y, 0.25), ymax = quantile(y, 0.75), y = mean(y))
+  }, geom = "errorbar", width = 0.1, color = "red") +
+  coord_cartesian(ylim = c(14, 24)) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Condition", y = "log2 F12 Abundance")
+#dev.off()
+
+#svg('Fgg_boxwhisk.svg', width = 4, height = 4)
+# Isolate Fgg
+Fggdat <- prot_dat_list_stats[grepl("P02680", prot_dat_list_stats$UniprotID),]
+# Pull out the columns with the abundance values
+Fggdat_proc <- Fggdat %>% select(SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Prepare data set for box-whisker plot
+Fggdat_proc_t <- rownames_to_column( as.data.frame( t(Fggdat_proc) ), var="Condition")
+colnames(Fggdat_proc_t)[2] <- "Abundance"
+# Remove the numbers indicating the sample size number
+Fggdat_proc_t$Condition <- gsub("_\\d+", "", Fggdat_proc_t$Condition)
+# Plot the box-whisker pairwise test for Fgg
+ggplot(Fggdat_proc_t, aes(x = Condition, y = Abundance, fill = Condition)) +
+  geom_jitter(shape = 21, width = 0.05, height = 0, size = 2, color = "black") + 
+  geom_bar(stat = "identity", fill = "transparent", color = "transparent") +
+  stat_summary(fun = mean, geom = "errorbar", aes(ymax = after_stat(y), ymin = after_stat(y)), width = 0.2, color = "red") +
+  stat_summary(fun.data = function(y) {
+    data.frame(ymin = quantile(y, 0.25), ymax = quantile(y, 0.75), y = mean(y))
+  }, geom = "errorbar", width = 0.1, color = "red") +
+  coord_cartesian(ylim = c(19, 30)) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Condition", y = "log2 Fgg Abundance")
+#dev.off()
+
+#svg('Plg_boxwhisk.svg', width = 4, height = 4)
+# Isolate Plg
+Plgdat <- prot_dat_list_stats[grepl("Q01177", prot_dat_list_stats$UniprotID),]
+# Pull out the columns with the abundance values
+Plgdat_proc <- Plgdat %>% select(SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Prepare data set for box-whisker plot
+Plgdat_proc_t <- rownames_to_column( as.data.frame( t(Plgdat_proc) ), var="Condition")
+colnames(Plgdat_proc_t)[2] <- "Abundance"
+# Remove the numbers indicating the sample size number
+Plgdat_proc_t$Condition <- gsub("_\\d+", "", Plgdat_proc_t$Condition)
+# Plot the box-whisker pairwise test for Plg
+ggplot(Plgdat_proc_t, aes(x = Condition, y = Abundance, fill = Condition)) +
+  geom_jitter(shape = 21, width = 0.05, height = 0, size = 2, color = "black") + 
+  geom_bar(stat = "identity", fill = "transparent", color = "transparent") +
+  stat_summary(fun = mean, geom = "errorbar", aes(ymax = after_stat(y), ymin = after_stat(y)), width = 0.2, color = "red") +
+  stat_summary(fun.data = function(y) {
+    data.frame(ymin = quantile(y, 0.25), ymax = quantile(y, 0.75), y = mean(y))
+  }, geom = "errorbar", width = 0.1, color = "red") +
+  coord_cartesian(ylim = c(19, 28)) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Condition", y = "log2 Plg Abundance")
+#dev.off()
+
+#svg('Serpina1_boxwhisk.svg', width = 4, height = 4)
+# Isolate Serpina1
+Serpina1dat <- prot_dat_list_stats[grepl("P17475", prot_dat_list_stats$UniprotID),]
+# Pull out the columns with the abundance values
+Serpina1dat_proc <- Serpina1dat %>% select(SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Prepare data set for box-whisker plot
+Serpina1dat_proc_t <- rownames_to_column( as.data.frame( t(Serpina1dat_proc) ), var="Condition")
+colnames(Serpina1dat_proc_t)[2] <- "Abundance"
+# Remove the numbers indicating the sample size number
+Serpina1dat_proc_t$Condition <- gsub("_\\d+", "", Serpina1dat_proc_t$Condition)
+# Plot the box-whisker pairwise test for Serpina1
+ggplot(Serpina1dat_proc_t, aes(x = Condition, y = Abundance, fill = Condition)) +
+  geom_jitter(shape = 21, width = 0.05, height = 0, size = 2, color = "black") + 
+  geom_bar(stat = "identity", fill = "transparent", color = "transparent") +
+  stat_summary(fun = mean, geom = "errorbar", aes(ymax = after_stat(y), ymin = after_stat(y)), width = 0.2, color = "red") +
+  stat_summary(fun.data = function(y) {
+    data.frame(ymin = quantile(y, 0.25), ymax = quantile(y, 0.75), y = mean(y))
+  }, geom = "errorbar", width = 0.1, color = "red") +
+  coord_cartesian(ylim = c(24, 30)) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Condition", y = "log2 Serpina1 Abundance")
+#dev.off()
+
+#svg('Serping1_boxwhisk.svg', width = 4, height = 4)
+# Isolate Serping1
+Serping1dat <- prot_dat_list_stats[grepl("Q6P734", prot_dat_list_stats$UniprotID),]
+# Pull out the columns with the abundance values
+Serping1dat_proc <- Serping1dat %>% select(SCI_1, SCI_2, SCI_3, SCI_4, SCI_5, SHAM_1, SHAM_2, SHAM_3, SHAM_4, SHAM_5, SHAM_6, SHAM_7)
+# Prepare data set for box-whisker plot
+Serping1dat_proc_t <- rownames_to_column( as.data.frame( t(Serping1dat_proc) ), var="Condition")
+colnames(Serping1dat_proc_t)[2] <- "Abundance"
+# Remove the numbers indicating the sample size number
+Serping1dat_proc_t$Condition <- gsub("_\\d+", "", Serping1dat_proc_t$Condition)
+# Plot the box-whisker pairwise test for Serping1
+ggplot(Serping1dat_proc_t, aes(x = Condition, y = Abundance, fill = Condition)) +
+  geom_jitter(shape = 21, width = 0.05, height = 0, size = 2, color = "black") + 
+  geom_bar(stat = "identity", fill = "transparent", color = "transparent") +
+  stat_summary(fun = mean, geom = "errorbar", aes(ymax = after_stat(y), ymin = after_stat(y)), width = 0.2, color = "red") +
+  stat_summary(fun.data = function(y) {
+    data.frame(ymin = quantile(y, 0.25), ymax = quantile(y, 0.75), y = mean(y))
+  }, geom = "errorbar", width = 0.1, color = "red") +
+  coord_cartesian(ylim = c(18, 25)) + 
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Condition", y = "log2 Serping1 Abundance")
+#dev.off()
+```
+
+# 9. LEADING EDGE GENE REPRESENTATION IN BIOLOGICAL PATHWAYS
+```{r GO:BP}
+# Function to replace gene names with UniprotID
+replace_genes <- function(core_string, gene_mapping) {
+  # Split by the "/" string
+  genes <- unlist(str_split(core_string, "/"))  
+  # Replace genes with respective UniprotID in columns, keep original if no match (unlikely)
+  genes <- sapply(genes, function(g) {
+    if (g %in% gene_mapping$GeneID) {
+      return(gene_mapping$UniprotID[match(g, gene_mapping$GeneID)])
+    } else {
+      return(g) 
+    }
+  })
+  return(paste(genes, collapse = "/"))
+}
+# Apply function to the GSEA data for leading edge gene (leg)
+gsea_filt_leg_go <- Proc_gsea_results_list_go %>%
+  mutate(core_enrichment = sapply(core_enrichment, replace_genes, gene_mapping = gsea_dat_list_stats_filt))
+
+# Create a new dataframe with Description as rownames
+gsea_leg_go_heatmap <- gsea_filt_leg_go %>%
+  select(Description, core_enrichment) %>%
+  mutate(across(everything(), as.character)) %>%  # Ensure character type
+  rowwise() %>% mutate(
+                        P01026 = as.integer(str_detect(core_enrichment, "P01026")),
+                        Q62930 = as.integer(str_detect(core_enrichment, "Q62930")),
+                        D3ZTE0 = as.integer(str_detect(core_enrichment, "D3ZTE0")),
+                        P02680 = as.integer(str_detect(core_enrichment, "P02680")),
+                        Q01177 = as.integer(str_detect(core_enrichment, "Q01177")),
+                        P17475 = as.integer(str_detect(core_enrichment, "P17475")),
+                        Q6P734 = as.integer(str_detect(core_enrichment, "Q6P734"))
+                      ) %>%
+                      ungroup() %>% select(-core_enrichment)  # Remove core_enrichment column
+
+# Convert Description column to row names
+rownames(gsea_leg_go_heatmap) <- gsea_filt_leg_go$Description
+# Add the NES values into the list
+gsea_leg_go_heatmap$NES <- gsea_filt_leg_go$NES
+# Remove rows where all 7 columns sum to 0
+gsea_leg_go_heatmap <- gsea_leg_go_heatmap[rowSums(gsea_leg_go_heatmap[, 2:8]) > 0, ]
+gsea_leg_go_heatmap <- column_to_rownames(gsea_leg_go_heatmap, var = colnames(gsea_leg_go_heatmap)[1])
+
+# Visualization and coloring
+# Force NES scale to be between -2.5 and 2.5
+NES_col_fun <- colorRamp2(c(-2.5, 0, 2.5), c("#4575b4", "white", "#d73027"))
+# Protein colors (0 = white, 1 = black)
+protein_col_fun <- c("0" = "white", "1" = "#430052")
+
+# Establish matrix with the protein data
+go_protein_matrix <- as.matrix(gsea_leg_go_heatmap[, 1:7])
+go_protein_matrix <- apply(go_protein_matrix, c(1, 2), as.numeric)
+# Prepare NES annotation
+go_NES_annot <- gsea_leg_go_heatmap$NES
+names(go_NES_annot) <- rownames(gsea_leg_go_heatmap)
+
+# Heatmap for proteins
+go_protein_map <- Heatmap(go_protein_matrix,
+                      col = protein_col_fun,
+                      cluster_rows = TRUE,
+                      cluster_columns = TRUE,
+                      show_column_names = TRUE,
+                      show_row_names = TRUE,
+                      name = "Protein",
+                      width = unit(25, "mm"),
+                      row_names_side = "left",
+                      border = TRUE,
+                      row_names_gp = gpar(fontsize = 5))
+# NES annotation heatmap
+go_annot_map <- Heatmap(go_NES_annot,
+                   col = NES_col_fun,
+                   name = "NES",
+                   width = unit(2, "mm"),
+                   show_row_names = FALSE,
+                   border = TRUE,
+                   heatmap_legend_param = list(
+                     at = c(-2.5, 0, 2.5),
+                     labels = c("-2.5", "0", "2.5"),
+                     color_bar = "continuous",
+                     legend_direction = "vertical") )
+# Combine heatmap of protein and NES values
+go_map_comb <-  go_protein_map + go_annot_map
+# Plot heatmap
+#svg('heatmap_GOBP.svg', width = 6, height = 5)
+draw(go_map_comb, heatmap_legend_side = "right", annotation_legend_side = "right",
+     row_dend_side="right")
+#dev.off()
+```
+
+```{r Reactome}
+# Function to replace gene names with UniprotID
+replace_genes <- function(core_string, gene_mapping) {
+  # Split by the "/" string
+  genes <- unlist(str_split(core_string, "/"))  
+  # Replace genes with respective UniprotID in columns, keep original if no match (unlikely)
+  genes <- sapply(genes, function(g) {
+    if (g %in% gene_mapping$GeneID) {
+      return(gene_mapping$UniprotID[match(g, gene_mapping$GeneID)])
+    } else {
+      return(g) 
+    }
+  })
+  return(paste(genes, collapse = "/"))
+}
+# Apply function to the GSEA data for leading edge gene (leg)
+gsea_filt_leg_reactome <- Proc_gsea_results_list_reactome %>%
+  mutate(core_enrichment = sapply(core_enrichment, replace_genes, gene_mapping = gsea_dat_list_stats_filt))
+
+# Create a new dataframe with Description as rownames
+gsea_leg_reactome_heatmap <- gsea_filt_leg_reactome %>%
+  select(Description, core_enrichment) %>%
+  mutate(across(everything(), as.character)) %>%  # Ensure character type
+  rowwise() %>% mutate(
+                        P01026 = as.integer(str_detect(core_enrichment, "P01026")),
+                        Q62930 = as.integer(str_detect(core_enrichment, "Q62930")),
+                        D3ZTE0 = as.integer(str_detect(core_enrichment, "D3ZTE0")),
+                        P02680 = as.integer(str_detect(core_enrichment, "P02680")),
+                        Q01177 = as.integer(str_detect(core_enrichment, "Q01177")),
+                        P17475 = as.integer(str_detect(core_enrichment, "P17475")),
+                        Q6P734 = as.integer(str_detect(core_enrichment, "Q6P734"))
+                      ) %>%
+                      ungroup() %>% select(-core_enrichment)  # Remove core_enrichment column
+
+# Convert Description column to row names
+rownames(gsea_leg_reactome_heatmap) <- gsea_filt_leg_reactome$Description
+# Add the NES values into the list
+gsea_leg_reactome_heatmap$NES <- gsea_filt_leg_reactome$NES
+# Remove rows where all 7 columns sum to 0
+gsea_leg_reactome_heatmap <- gsea_leg_reactome_heatmap[rowSums(gsea_leg_reactome_heatmap[, 2:8]) > 0, ]
+gsea_leg_reactome_heatmap <- column_to_rownames(gsea_leg_reactome_heatmap, var = colnames(gsea_leg_reactome_heatmap)[1])
+
+# Establish matrix with the protein data
+reactome_protein_matrix <- as.matrix(gsea_leg_reactome_heatmap[, 1:7])
+reactome_protein_matrix <- apply(reactome_protein_matrix, c(1, 2), as.numeric)
+# Prepare NES annotation
+reactome_NES_annot <- gsea_leg_reactome_heatmap$NES
+names(reactome_NES_annot) <- rownames(gsea_leg_reactome_heatmap)
+
+# Heatmap for proteins
+reactome_protein_map <- Heatmap(reactome_protein_matrix,
+                      col = protein_col_fun,
+                      cluster_rows = TRUE,
+                      cluster_columns = TRUE,
+                      show_column_names = TRUE,
+                      show_row_names = TRUE,
+                      name = "Protein",
+                      width = unit(25, "mm"),
+                      row_names_side = "left",
+                      border = TRUE,
+                      row_names_gp = gpar(fontsize = 5))
+# NES annotation heatmap
+reactome_annot_map <- Heatmap(reactome_NES_annot,
+                   col = NES_col_fun,
+                   name = "NES",
+                   width = unit(2, "mm"),
+                   show_row_names = FALSE,
+                   border = TRUE,
+                   heatmap_legend_param = list(
+                     at = c(-2.5, 0, 2.5),
+                     labels = c("-2.5", "0", "2.5"),
+                     color_bar = "continuous",
+                     legend_direction = "vertical") )
+# Combine heatmap of protein and NES values
+reactome_map_comb <-  reactome_protein_map + reactome_annot_map
+# Plot heatmap
+#svg('heatmap_reactome.svg', width = 6, height = 5)
+draw(reactome_map_comb, heatmap_legend_side = "right", annotation_legend_side = "right",
+     row_dend_side="right")
+#dev.off()
+```
+
+```{r Hallmark}
+# Function to replace gene names with UniprotID
+replace_genes <- function(core_string, gene_mapping) {
+  # Split by the "/" string
+  genes <- unlist(str_split(core_string, "/"))  
+  # Replace genes with respective UniprotID in columns, keep original if no match (unlikely)
+  genes <- sapply(genes, function(g) {
+    if (g %in% gene_mapping$GeneID) {
+      return(gene_mapping$UniprotID[match(g, gene_mapping$GeneID)])
+    } else {
+      return(g) 
+    }
+  })
+  return(paste(genes, collapse = "/"))
+}
+# Apply function to the GSEA data for leading edge gene (leg)
+gsea_filt_leg_hallmark <- Proc_gsea_results_list_hallmark %>%
+  mutate(core_enrichment = sapply(core_enrichment, replace_genes, gene_mapping = gsea_dat_list_stats_filt))
+
+# Create a new dataframe with Description as rownames
+gsea_leg_hallmark_heatmap <- gsea_filt_leg_hallmark %>%
+  select(Description, core_enrichment) %>%
+  mutate(across(everything(), as.character)) %>%  # Ensure character type
+  rowwise() %>% mutate(
+                        P01026 = as.integer(str_detect(core_enrichment, "P01026")),
+                        Q62930 = as.integer(str_detect(core_enrichment, "Q62930")),
+                        D3ZTE0 = as.integer(str_detect(core_enrichment, "D3ZTE0")),
+                        P02680 = as.integer(str_detect(core_enrichment, "P02680")),
+                        Q01177 = as.integer(str_detect(core_enrichment, "Q01177")),
+                        P17475 = as.integer(str_detect(core_enrichment, "P17475")),
+                        Q6P734 = as.integer(str_detect(core_enrichment, "Q6P734"))
+                      ) %>%
+                      ungroup() %>% select(-core_enrichment)  # Remove core_enrichment column
+
+# Convert Description column to row names
+rownames(gsea_leg_hallmark_heatmap) <- gsea_filt_leg_hallmark$Description
+# Add the NES values into the list
+gsea_leg_hallmark_heatmap$NES <- gsea_filt_leg_hallmark$NES
+# Remove rows where all 7 columns sum to 0
+gsea_leg_hallmark_heatmap <- gsea_leg_hallmark_heatmap[rowSums(gsea_leg_hallmark_heatmap[, 2:8]) > 0, ]
+gsea_leg_hallmark_heatmap <- column_to_rownames(gsea_leg_hallmark_heatmap, var = colnames(gsea_leg_hallmark_heatmap)[1])
+
+# Establish matrix with the protein data
+hallmark_protein_matrix <- as.matrix(gsea_leg_hallmark_heatmap[, 1:7])
+hallmark_protein_matrix <- apply(hallmark_protein_matrix, c(1, 2), as.numeric)
+# Prepare NES annotation
+hallmark_NES_annot <- gsea_leg_hallmark_heatmap$NES
+names(hallmark_NES_annot) <- rownames(gsea_leg_hallmark_heatmap)
+
+# Heatmap for proteins
+hallmark_protein_map <- Heatmap(hallmark_protein_matrix,
+                      col = protein_col_fun,
+                      cluster_rows = TRUE,
+                      cluster_columns = TRUE,
+                      show_column_names = TRUE,
+                      show_row_names = TRUE,
+                      name = "Protein",
+                      width = unit(25, "mm"),
+                      row_names_side = "left",
+                      border = TRUE,
+                      row_names_gp = gpar(fontsize = 5))
+# NES annotation heatmap
+hallmark_annot_map <- Heatmap(hallmark_NES_annot,
+                   col = NES_col_fun,
+                   name = "NES",
+                   width = unit(2, "mm"),
+                   show_row_names = FALSE,
+                   border = TRUE,
+                   heatmap_legend_param = list(
+                     at = c(-2.5, 0, 2.5),
+                     labels = c("-2.5", "0", "2.5"),
+                     color_bar = "continuous",
+                     legend_direction = "vertical") )
+# Combine heatmap of protein and NES values
+hallmark_map_comb <-  hallmark_protein_map + hallmark_annot_map
+# Plot heatmap
+#svg('heatmap_hallmark.svg', width = 6, height = 5)
+draw(hallmark_map_comb, heatmap_legend_side = "right", annotation_legend_side = "right",
+     row_dend_side="right")
+#dev.off()
+```
+
+```{r KEGG}
+# Function to replace gene names with UniprotID
+replace_genes <- function(core_string, gene_mapping) {
+  # Split by the "/" string
+  genes <- unlist(str_split(core_string, "/"))  
+  # Replace genes with respective UniprotID in columns, keep original if no match (unlikely)
+  genes <- sapply(genes, function(g) {
+    if (g %in% gene_mapping$GeneID) {
+      return(gene_mapping$UniprotID[match(g, gene_mapping$GeneID)])
+    } else {
+      return(g) 
+    }
+  })
+  return(paste(genes, collapse = "/"))
+}
+# Apply function to the GSEA data for leading edge gene (leg)
+gsea_filt_leg_kegg <- Proc_gsea_results_list_kegg %>%
+  mutate(core_enrichment = sapply(core_enrichment, replace_genes, gene_mapping = gsea_dat_list_stats_filt))
+
+# Create a new dataframe with Description as rownames
+gsea_leg_kegg_heatmap <- gsea_filt_leg_kegg %>%
+  select(Description, core_enrichment) %>%
+  mutate(across(everything(), as.character)) %>%  # Ensure character type
+  rowwise() %>% mutate(
+                        P01026 = as.integer(str_detect(core_enrichment, "P01026")),
+                        Q62930 = as.integer(str_detect(core_enrichment, "Q62930")),
+                        D3ZTE0 = as.integer(str_detect(core_enrichment, "D3ZTE0")),
+                        P02680 = as.integer(str_detect(core_enrichment, "P02680")),
+                        Q01177 = as.integer(str_detect(core_enrichment, "Q01177")),
+                        P17475 = as.integer(str_detect(core_enrichment, "P17475")),
+                        Q6P734 = as.integer(str_detect(core_enrichment, "Q6P734"))
+                      ) %>%
+                      ungroup() %>% select(-core_enrichment)  # Remove core_enrichment column
+
+# Convert Description column to row names
+rownames(gsea_leg_kegg_heatmap) <- gsea_filt_leg_kegg$Description
+# Add the NES values into the list
+gsea_leg_kegg_heatmap$NES <- gsea_filt_leg_kegg$NES
+# Remove rows where all 7 columns sum to 0
+gsea_leg_kegg_heatmap <- gsea_leg_kegg_heatmap[rowSums(gsea_leg_kegg_heatmap[, 2:8]) > 0, ]
+gsea_leg_kegg_heatmap <- column_to_rownames(gsea_leg_kegg_heatmap, var = colnames(gsea_leg_kegg_heatmap)[1])
+
+# Establish matrix with the protein data
+kegg_protein_matrix <- as.matrix(gsea_leg_kegg_heatmap[, 1:7])
+kegg_protein_matrix <- apply(kegg_protein_matrix, c(1, 2), as.numeric)
+# Prepare NES annotation
+kegg_NES_annot <- gsea_leg_kegg_heatmap$NES
+names(kegg_NES_annot) <- rownames(gsea_leg_kegg_heatmap)
+
+# Heatmap for proteins
+kegg_protein_map <- Heatmap(kegg_protein_matrix,
+                      col = protein_col_fun,
+                      cluster_rows = TRUE,
+                      cluster_columns = TRUE,
+                      show_column_names = TRUE,
+                      show_row_names = TRUE,
+                      name = "Protein",
+                      width = unit(25, "mm"),
+                      row_names_side = "left",
+                      border = TRUE,
+                      row_names_gp = gpar(fontsize = 5))
+# NES annotation heatmap
+kegg_annot_map <- Heatmap(kegg_NES_annot,
+                   col = NES_col_fun,
+                   name = "NES",
+                   width = unit(2, "mm"),
+                   show_row_names = FALSE,
+                   border = TRUE,
+                   heatmap_legend_param = list(
+                     at = c(-2.5, 0, 2.5),
+                     labels = c("-2.5", "0", "2.5"),
+                     color_bar = "continuous",
+                     legend_direction = "vertical") )
+# Combine heatmap of protein and NES values
+kegg_map_comb <-  kegg_protein_map + kegg_annot_map
+# Plot heatmap
+#svg('heatmap_kegg.svg', width = 6, height = 5)
+draw(kegg_map_comb, heatmap_legend_side = "right", annotation_legend_side = "right",
+     row_dend_side="right")
+#dev.off()
+
+#### NOTE: LUPUS IS NOT SIGNIFICANT. IT WAS INCLUDED TO ENSURE HEATMAP TO RUN, BUT REMOVED FROM THE FIGURE PORTION OF THE STUDY
+```
+
+
+********************** END OF SCRIPT **********************
+
