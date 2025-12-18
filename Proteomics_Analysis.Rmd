@@ -1,0 +1,1496 @@
+---
+title: "Proteomics Analysis SCI & SHAM"
+author: "Brendan K. Ball"
+date: "2025-12-18"
+output: html_document
+---
+
+# 1. PACKAGES IMPORT
+```{r Import Required Packages}
+# Downloads and calls from the library the necessary packages needed to run the code
+if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (stringr, verbose = FALSE))
+if(!require(gtools)) install.packages("gtools", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (gtools, verbose = FALSE))
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (dplyr, verbose = FALSE))
+if(!require(factoextra)) install.packages("factoextra", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (factoextra, verbose = FALSE))
+if(!require(devtools)) install.packages("devtools", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (devtools, verbose = FALSE))
+if(!require(data.table)) install.packages("data.table", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (data.table, verbose = FALSE))
+if(!require(tibble)) install.packages("tibble", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tibble, verbose = FALSE))
+if(!require(lme4)) install.packages("lme4", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (lme4, verbose = FALSE))
+if(!require(emmeans)) install.packages("emmeans", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (emmeans, verbose = FALSE))
+if(!require(effects)) install.packages("effects", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (effects, verbose = FALSE))
+if(!require(ggforce)) install.packages("ggforce", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (ggforce, verbose = FALSE))
+if(!require(pheatmap)) install.packages("pheatmap", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (pheatmap, verbose = FALSE))
+if(!require(limma)) install.packages("limma", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (limma, verbose = FALSE))
+if(!require(umap)) install.packages("umap", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (umap, verbose = FALSE))
+if(!require(dplyr)) install.packages("dplyr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (dplyr, verbose = FALSE))
+if(!require(stringr)) install.packages("stringr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (stringr, verbose = FALSE))
+if(!require(powerjoin)) install.packages("powerjoin", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (powerjoin, verbose = FALSE))
+if(!require(tidyr)) install.packages("tidyr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tidyr, verbose = FALSE))
+if(!require(purrr)) install.packages("purrr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (purrr, verbose = FALSE))
+if(!require(fgsea)) install.packages("fgsea", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (fgsea, verbose = FALSE)) # Imported using BiocManager::install("fgsea")
+if(!require(glmnet)) install.packages("glmnet", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (glmnet, verbose = FALSE))
+if(!require(tidyverse)) install.packages("tidyverse", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tidyverse, verbose = FALSE))
+if(!require(orthogene)) install.packages("orthogene", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (orthogene, verbose = FALSE))
+if(!require(openxlsx)) install.packages("openxlsx", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (openxlsx, verbose = FALSE))
+if(!require(ggpubr)) install.packages("ggpubr", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (ggpubr, verbose = FALSE))
+if(!require(writexl)) install.packages("writexl", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (writexl, verbose = FALSE))
+if (!require("msigdbr")) {BiocManager::install("msigdbr")}
+suppressWarnings(library (msigdbr, verbose = FALSE))
+if(!require(reshape2)) install.packages("reshape2", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (reshape2, verbose = FALSE))
+if (!require("AnnotationDbi")) {BiocManager::install("AnnotationDbi")}
+suppressWarnings(library (AnnotationDbi, verbose = FALSE))
+if(!require(ggraph)) install.packages("ggraph", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (ggraph, verbose = FALSE))
+if(!require(igraph)) install.packages("igraph", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (igraph, verbose = FALSE))
+if(!require(tidygraph)) install.packages("tidygraph", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (tidygraph, verbose = FALSE))
+if(!require(VennDiagram)) install.packages("VennDiagram", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (VennDiagram, verbose = FALSE))
+if(!require(VIM)) install.packages("VIM", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (VIM, verbose = FALSE)) 
+if(!require(circlize)) install.packages("circlize", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (circlize, verbose = FALSE))
+if(!require(plotly)) install.packages("plotly", repos = "http://cran.us.r-project.org")
+suppressWarnings(library (plotly, verbose = FALSE))
+
+# Bioconductor
+if (!requireNamespace('BiocManager', quietly = TRUE))
+  install.packages('BiocManager')
+BiocManager::install("org.Rn.eg.db")
+library(org.Rn.eg.db)
+BiocManager::install("org.Hs.eg.db")
+library(org.Hs.eg.db)
+BiocManager::install("sva")
+library("sva")
+BiocManager::install("EnrichmentBrowser")
+library(EnrichmentBrowser)
+BiocManager::install("mixOmics")
+library(mixOmics)
+BiocManager::install("clusterProfiler")
+library(clusterProfiler)
+BiocManager::install("EnhancedVolcano")
+library(EnhancedVolcano)
+```
+
+# 2. SCI Proteomics Data Import
+```{r Data Import}
+# Import proteomics values
+SCI_dat <- read.csv("SCI_proteomics.csv")
+# Rename the columns
+colnames(SCI_dat)[1] <- "UniprotID"
+colnames(SCI_dat)[3] <- "Protein"
+colnames(SCI_dat)[5] <- "sham_1"
+colnames(SCI_dat)[6] <- "sham_2"
+colnames(SCI_dat)[7] <- "sci_1"
+colnames(SCI_dat)[8] <- "sci_2"
+colnames(SCI_dat)[9] <- "sci_3"
+colnames(SCI_dat)[10] <- "sham_3"
+colnames(SCI_dat)[11] <- "sham_4"
+colnames(SCI_dat)[12] <- "sham_5"
+colnames(SCI_dat)[13] <- "sci_4"
+colnames(SCI_dat)[14] <- "sci_5"
+# Rearrange the data 
+SCI_dat <- SCI_dat[, c("UniprotID", "Protein", "sham_1", "sham_2", "sham_3", "sham_4", "sham_5", "sci_1", "sci_2", "sci_3", "sci_4", "sci_5")]
+# Select the needed columns
+SCI_UniprotNames <- SCI_dat %>% dplyr::select(UniprotID, Protein)
+```
+
+```{r Data Normalization and Transformation}
+# Check for number of NA in each data sample
+SCIna_counts1 <- colSums(is.na(SCI_dat))
+# Data removal if missing 50% or more entries in a given row
+# Missing more than half of the information in a row (>5), remove
+SCI_dat_NA <- SCI_dat[rowSums(is.na(SCI_dat)) < 4, ]
+SCI_dat <-SCI_dat_NA
+# log2 transform the abundance values
+SCI_dat[, 3:12] <- log2(SCI_dat[,3:12])
+```
+
+```{r Visualizing Missing Data}
+# Prepare as separate dataframe variable for quantification
+SCI_dat_vis <- SCI_dat
+# Replace missing values with 0
+SCI_dat_vis <- SCI_dat_vis %>% mutate_all(~replace(., is.na(.), 0))
+# Data cleaning for heatmap preparation
+SCI_dat_heatmap <- SCI_dat_vis[(-c(1:2))]
+rownames(SCI_dat_heatmap) <- SCI_dat_vis$UniprotID
+SCI_dat_heatmap <- ifelse(SCI_dat_heatmap == 0, 0, 1)
+# Generate the heat map
+pheatmap(SCI_dat_heatmap,
+  cluster_rows = F,
+  cluster_cols = F,
+  color = colorRampPalette(c("#fee820", "#450055"))(100),
+  border_color = NA,
+  breaks = seq(0, 1, length.out = 100),
+  angle_col = "90",
+  fontsize_col = 3,
+  fontsize_row = 3,
+  show_rownames = FALSE
+)
+#ggsave("ImputingVarSCI.svg", plot = ImputingVarSCI, width = 6, height = 4, units = "in")
+```
+
+```{r Data Imputation}
+# Imputation using KNN (BATCH 1)
+SCI_dat_imp1 <- kNN(SCI_dat, variable=c("sham_1", "sham_2", "sham_3", "sham_4", "sham_5",
+                                          "sci_1", "sci_2", "sci_3", "sci_4", "sci_5"), k=3)
+```
+
+```{r Plot of Distribution Before and After KNN Imputation}
+# Convert original data to long format
+SCI_dat_long <- SCI_dat %>%
+  pivot_longer(cols = 3:12, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Original")
+# Convert imputed data to long format
+SCI_dat_imp1_long <- SCI_dat_imp1 %>%
+  pivot_longer(cols = 3:12, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Imputed")
+# Combine both datasets
+combined_data <- bind_rows(SCI_dat_long, SCI_dat_imp1_long)
+combined_data <- combined_data %>% drop_na(Expression)
+# Plot density distribution
+ggplot(combined_data, aes(x = Expression, fill = DataType)) +
+  geom_density(alpha = 0.5) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Protein Expression", y = "Density") +
+  scale_fill_manual(values = c("Original" = "blue", "Imputed" = "red")) + 
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 0.2), expand = c(0, 0))
+#ggsave("SCI_distribution.svg", plot = SCI_distribution, width = 6, height = 4, units = "in")
+```
+
+```{r Principal Component Analysis}
+# Pull the imputed data only
+SCI_dat_imp1_norm <- SCI_dat_imp1[, 1:12]
+# Pull out desired columns
+combined_SCI_dat_filt_t <- SCI_dat_imp1_norm %>% select(UniprotID, sham_1, sham_2, sham_3, sham_4, sham_5, sci_1, sci_2, sci_3, sci_4, sci_5)
+# Move the first column as row name
+rownames(combined_SCI_dat_filt_t) <- combined_SCI_dat_filt_t[[1]]
+combined_SCI_dat_filt_t <- combined_SCI_dat_filt_t[-1]   
+# Take the transpose
+combined_SCI_dat_filt_t <- t(combined_SCI_dat_filt_t)
+# Move the row name back to first column
+combined_SCI_dat_filt_t <- as.data.frame(combined_SCI_dat_filt_t)
+combined_SCI_dat_filt_t <- rownames_to_column(combined_SCI_dat_filt_t, var = "Condition")
+# Remove the replicate number to keep only the group
+combined_SCI_dat_filt_t$Condition <- gsub("_\\d+", "", combined_SCI_dat_filt_t$Condition)
+# Prepare the principal components
+SCIdat_pr <- prcomp(combined_SCI_dat_filt_t[c(2:ncol(combined_SCI_dat_filt_t))], center = TRUE, scale = TRUE)
+# Create PCA chart with coloring/grouping based on different rat groups
+g1 <- fviz_pca_ind(SCIdat_pr, 
+                   label="none", 
+                   alpha.ind=1, 
+                   pointshape=19, 
+                   habillage=combined_SCI_dat_filt_t$Condition, 
+                   pointsize = 2, 
+                   repel = TRUE, 
+                   col.ind = "black", 
+                   invisible="quali",
+                   palette = c("#c51b7d","#4d9221"))
+g1 +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),  # Remove major gridlines
+        panel.grid.minor = element_blank(),   # Remove minor gridlines
+        aspect.ratio=1
+       )
+#ggsave("PCA_SCI.svg", plot = PCA_SCI, width = 6, height = 4, units = "in")
+```
+
+```{r Differentially Abundant Protein Analysis}
+SCI_dat_bc<- SCI_dat_imp1_norm %>% dplyr::select(-Protein)
+# Set UniprotID as row names
+rownames(SCI_dat_bc) <- SCI_dat_bc$UniprotID
+SCI_dat_bc <- SCI_dat_bc[,-1]
+# Define conditions
+condition <- c( rep("sham", 5), rep("sci", 5))
+design <- model.matrix(~0 + condition)
+colnames(design) <- c("sci", "sham")
+# Contrast: acrolein relative to saline
+contrast.matrix <- makeContrasts(sci_vs_sham = sci - sham, levels = design)
+# Run limma
+fit <- lmFit(SCI_dat_bc, design, method="robust", maxit=1000)
+fit <- contrasts.fit(fit, contrast.matrix)
+fit <- eBayes(fit)
+# Extract results
+results <- topTable(fit, coef="sci_vs_sham", number=Inf, adjust.method="BH")
+results$UniprotID <- rownames(results)
+# Volcano plot
+ggplot(results, aes(x = logFC, y = -log10(adj.P.Val))) +
+  geom_point(aes(color = factor(ifelse(adj.P.Val < 0.05 & abs(logFC) > 1, "Significant & FC",
+                                     ifelse(adj.P.Val < 0.05 & abs(logFC) <= 1, "Significant", "NS")))), 
+             alpha = 1, size=0.5) +
+  scale_color_manual(values = c("NS" = "black", 
+                                "Significant & FC" = "red", 
+                                "Significant" = "blue")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") + 
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  labs(x = "Log2FC", 
+       y = "-Log10 Padj", 
+       color = "Legend") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  scale_y_continuous(limits = c(0, 10), expand = c(0, 0))
+#ggsave("SCIvolcano.svg", plot = SCIvolcano, width = 6, height = 4, units = "in")
+
+# Interactive plot to show genes
+plotint <- ggplot(results, aes(x = logFC, y = -log10(adj.P.Val))) +
+  geom_point(aes(
+    color = factor(ifelse(adj.P.Val < 0.05 & abs(logFC) > 1, "Significant & FC",
+                          ifelse(adj.P.Val < 0.05 & abs(logFC) <= 1, "Significant", "NS"))),
+    text = UniprotID
+  ), alpha = 1, size = 0.5) +
+  scale_color_manual(values = c("NS" = "black", 
+                                "Significant & FC" = "red", 
+                                "Significant" = "blue")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") + 
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  labs(x = "Log2FC", 
+       y = "-Log10 Padj", 
+       color = "Legend") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  scale_y_continuous(limits = c(0, 10), expand = c(0, 0))
+
+plotly::ggplotly(plotint, tooltip = "text")
+SCI_DAP <- results
+SCI_DAP <- merge(SCI_UniprotNames, SCI_DAP, by = "UniprotID", all = TRUE)
+#write.csv(SCI_DAP, "SCI_DAP.csv", row.names = FALSE)
+```
+
+```{r Save Processed File}
+# Prepare protein and uniprotID list conversion
+protein_list <- SCI_dat_imp1_norm[c("UniprotID", "Protein")]
+# Merge data with respective label
+SCI_dat_bc_label <- merge(results, protein_list, by = "UniprotID", all = TRUE)
+# Move Protein label after UniprotID
+SCI_dat_bc_label <- SCI_dat_bc_label %>% 
+  relocate(Protein, .after = UniprotID)
+```
+
+# 3. HIERARCHICAL CLUSTERING ANALYSIS VIA HEATMAP FOR SCI
+```{r Heatmap Figure - Overall}
+# Data cleaning for heatmap preparation
+SCI_dat_heatmap <- SCI_dat_bc
+# Transpose to perform z-score normalization
+SCI_dat_heatmap_t <- as.data.frame(t(SCI_dat_heatmap))
+# Function to calculate z-score for a vector
+calc_z_score <- function(x) {
+  (x - mean(x)) / sd(x)
+}
+# Loop through each column and apply the z-score transformation
+for (i in 1:ncol(SCI_dat_heatmap_t)) {
+  SCI_dat_heatmap_t[,i] <- calc_z_score(SCI_dat_heatmap_t[,i])
+}
+# Revert to original transpose
+SCI_dat_heatmap <- as.data.frame(t(SCI_dat_heatmap_t))
+# Reorder the heatmap with SCI and SHAM ordering
+SCI_dat_heatmap <-SCI_dat_heatmap[, c("sham_1", "sham_2", "sham_3", "sham_4", "sham_5", "sci_1", "sci_2", "sci_3", "sci_4", "sci_5")]
+
+SCI_dat_heatmap <- as.matrix(SCI_dat_heatmap)
+
+# Generate the heat map
+pheatmap(SCI_dat_heatmap,
+  cluster_rows = TRUE,
+  cluster_cols = FALSE,
+  color = colorRampPalette(c("#2166ac", "white", "#b2182b"))(1000),
+  border_color = NA,
+  breaks = seq(-3, 3, length.out = 1000),
+  angle_col = "90",
+  fontsize_col = 3,
+  fontsize_row = 3,
+  show_colnames = TRUE,
+  show_rownames = FALSE)
+```
+
+```{r Heatmap Figure - Significant Proteins 1}
+# Move rownames to the first column
+SCI_dat_bc2 <- rownames_to_column(SCI_dat_bc, var = "UniprotID")
+# Merge the samples data with the statistics from limma
+SCI_dat_bc_merge <- merge(SCI_dat_bc_label, SCI_dat_bc2, by = "UniprotID", all = TRUE)
+# Reorder columns such that samples are after the Protein name column
+SCI_dat_list_stats <- SCI_dat_bc_merge %>%
+  relocate(all_of(colnames(SCI_dat_bc_merge)[9:18]), .after = Protein) 
+
+# Prepare new variable name for the heatmap
+SCI_dat_heatmap_filt <- SCI_dat_list_stats
+# Replace samples with the z-score values
+SCI_dat_heatmap_filt[,3:12] <- SCI_dat_heatmap
+# Filter the data by p adj < 0.05 ad logFC > |1|
+SCI_dat_heatmap_filt2 <- SCI_dat_heatmap_filt %>%
+  filter(adj.P.Val < 0.05, abs(logFC) > 1)
+
+# Organize presented order of the variables in the heatmap
+SCI_dat_heatmap_plot2 <- SCI_dat_heatmap_filt2[, c("UniprotID", "sci_1", "sci_2", "sci_3", "sci_4", "sci_5", "sham_1", "sham_2", "sham_3", "sham_4", "sham_5")]
+SCI_dat_heatmap_plot2 <- SCI_dat_heatmap_plot2 %>%
+  column_to_rownames(var = colnames(SCI_dat_heatmap_plot2)[1])
+
+SCI_dat_heatmap_plot2 <- as.matrix(SCI_dat_heatmap_plot2)
+
+# Generate the heat map
+pheatmap(SCI_dat_heatmap_plot2,
+  cluster_rows = TRUE,
+  cluster_cols = FALSE,
+  color = colorRampPalette(c("#2166ac", "white", "#b2182b"))(1000),
+  border_color = NA,
+  breaks = seq(-3, 3, length.out = 1000),
+  angle_col = "90",
+  fontsize_col = 3,
+  fontsize_row = 3,
+  show_colnames = TRUE,
+  show_rownames = TRUE)
+#ggsave("SCIheatmap.svg", plot = SCIheatmap, width = 6, height = 4, units = "in")
+
+# Saving the filtered list of significant and log2FC list of proteins
+#write.xlsx(SCI_dat_heatmap_filt2, "STRINGDB_SCI_dat_heatmap_filt2.xlsx", rownames=TRUE)
+```
+
+
+# 4. DATA IMPORT OF FILES FOR ACROLEIN
+```{r Data Import}
+# Import proteomics values
+ACR_dat <- read.csv("Acrolein-saline_proteomics.csv")
+```
+
+# 5. DATA PRE-PROCESSING
+```{r Data Preparation}
+# Remove column in data
+ACR_dat <- ACR_dat %>% dplyr::select(-Protein.Names)
+ACR_dat <- ACR_dat %>% dplyr::select(-Gene.Name)
+colnames(ACR_dat)[1] <- "Accession"
+# Rename the columns to respective conditions
+colnames(ACR_dat)[3] <- "saline_1"
+colnames(ACR_dat)[4] <- "saline_2"
+colnames(ACR_dat)[5] <- "saline_3"
+colnames(ACR_dat)[6] <- "saline_4"
+colnames(ACR_dat)[7] <- "saline_5"
+
+colnames(ACR_dat)[8] <- "acrolein_1"
+colnames(ACR_dat)[9] <- "acrolein_2"
+colnames(ACR_dat)[10] <- "acrolein_3"
+colnames(ACR_dat)[11] <- "acrolein_4"
+colnames(ACR_dat)[12] <- "acrolein_5"
+# Make data frame numeric
+for (i in 3:ncol(ACR_dat)) {
+  ACR_dat[,i] <- as.numeric(ACR_dat[,i])
+}
+# Rename descriptors
+colnames(ACR_dat)[1] <- "UniprotID"
+colnames(ACR_dat)[2] <- "Protein"
+# Select out the two columns
+ACR_UniprotNames <- ACR_dat %>% dplyr::select(UniprotID, Protein)
+```
+
+```{r Data Normalization and Transformation}
+# Check for number of NA in each data sample
+na_counts1 <- colSums(is.na(ACR_dat))
+
+# Data removal if missing 50% or more entries in a given row
+# Missing more than half of the information in a row (>5), remove
+ACR_dat_NA <- ACR_dat[rowSums(is.na(ACR_dat)) < 4, ]
+ACR_dat <- ACR_dat_NA
+
+# log2 transform the abundance values
+ACR_dat[, 3:12] <- log2(ACR_dat[,3:12])
+```
+
+```{r Visualizing Missing Data}
+# Prepare as separate dataframe variable for quantification
+ACR_dat_vis <- ACR_dat
+# Replace missing values with 0
+ACR_dat_vis <- ACR_dat_vis %>% mutate_all(~replace(., is.na(.), 0))
+# Data cleaning for heatmap preparation
+ACR_dat_heatmap <- ACR_dat_vis[(-c(1:2))]
+rownames(ACR_dat_heatmap) <- ACR_dat_vis$UniprotID
+ACR_dat_heatmap <- ifelse(ACR_dat_heatmap == 0, 0, 1)
+
+# Generate the heat map
+pheatmap(ACR_dat_heatmap,
+  cluster_rows = F,
+  cluster_cols = F,
+  color = colorRampPalette(c("#fee820", "#450055"))(100),
+  border_color = NA,
+  breaks = seq(0, 1, length.out = 100),
+  angle_col = "90",
+  fontsize_col = 3,
+  fontsize_row = 3,
+  show_rownames = FALSE
+)
+#ggsave("ImputingVarACR.svg", plot = ImputingVarACR, width = 6, height = 4, units = "in")
+```
+
+```{r Batch 1 and 2 Imputation}
+# Imputation using KNN (BATCH 1)
+ACR_dat_imp1 <- kNN(ACR_dat, variable=c("saline_1", "saline_2", "saline_3", "saline_4", "saline_5",
+                                          "acrolein_1", "acrolein_2", "acrolein_3", "acrolein_4", "acrolein_5"), k=3)
+```
+
+```{r Plot of Distribution Before and After KNN Imputation}
+# Convert original data to long format
+ACR_dat_long <- ACR_dat %>%
+  pivot_longer(cols = 3:12, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Original")
+# Convert imputed data to long format
+ACR_dat_imp1_long <- ACR_dat_imp1 %>%
+  pivot_longer(cols = 3:12, names_to = "Sample", values_to = "Expression") %>%
+  mutate(DataType = "Imputed")
+# Combine both datasets
+combined_data <- bind_rows(ACR_dat_long, ACR_dat_imp1_long)
+combined_data <- combined_data %>% drop_na(Expression)
+# Plot density distribution
+ggplot(combined_data, aes(x = Expression, fill = DataType)) +
+  geom_density(alpha = 0.5) +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  labs(x = "Protein Expression", y = "Density") +
+  scale_fill_manual(values = c("Original" = "blue", "Imputed" = "red")) + 
+  scale_x_continuous(expand = c(0, 0)) +
+  scale_y_continuous(limits = c(0, 0.2), expand = c(0, 0))
+#ggsave("ACR_distribution.svg", plot = ACR_distribution, width = 6, height = 4, units = "in")
+```
+
+```{r Prinicpal Component Analysis for Acrolein}
+# Pull the imputed data only
+ACR_dat_imp1_norm <- ACR_dat_imp1[, 1:12]
+
+# Pull out desired columns
+combined_ACR_dat_filt_t <- ACR_dat_imp1_norm %>% select(UniprotID, saline_1, saline_2, saline_3, saline_4, saline_5, acrolein_1, acrolein_2, acrolein_3, acrolein_4, acrolein_5)
+# Move the first column as row name
+rownames(combined_ACR_dat_filt_t) <- combined_ACR_dat_filt_t[[1]]
+combined_ACR_dat_filt_t <- combined_ACR_dat_filt_t[-1]   
+# Take the transpose
+combined_ACR_dat_filt_t <- t(combined_ACR_dat_filt_t)
+# Move the row name back to first column
+combined_ACR_dat_filt_t <- as.data.frame(combined_ACR_dat_filt_t)
+combined_ACR_dat_filt_t <- rownames_to_column(combined_ACR_dat_filt_t, var = "Condition")
+# Remove the replicate number to keep only the group
+combined_ACR_dat_filt_t$Condition <- gsub("_\\d+", "", combined_ACR_dat_filt_t$Condition)
+
+# Prepare the principal components
+ACRdat_pr <- prcomp(combined_ACR_dat_filt_t[c(2:ncol(combined_ACR_dat_filt_t))], center = TRUE, scale = TRUE)
+# Create PCA chart with coloring/grouping based on different rat groups
+g1 <- fviz_pca_ind(ACRdat_pr, 
+                   label="none", 
+                   alpha.ind=1, 
+                   pointshape=19, 
+                   habillage=combined_ACR_dat_filt_t$Condition, 
+                   pointsize = 2, 
+                   repel = TRUE, 
+                   col.ind = "black", 
+                   invisible="quali",
+                   palette = c("#c51b7d","#4d9221"))
+g1 +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(),  # Remove major gridlines
+        panel.grid.minor = element_blank(),   # Remove minor gridlines
+        aspect.ratio=1
+       )
+#ggsave("PCA_ACR.svg", plot = PCA_ACR, width = 6, height = 4, units = "in")
+```
+
+# 6. DIFFERENTIALLY ABUNDANT PROTEIN ANALYSIS
+```{r Differentially Abundant Protein Analysis}
+ACR_dat_bc<- ACR_dat_imp1_norm %>% dplyr::select(-Protein)
+# Set UniprotID as row names
+rownames(ACR_dat_bc) <- ACR_dat_bc$UniprotID
+ACR_dat_bc <- ACR_dat_bc[,-1]  # Remove UniprotID column
+# Define conditions
+condition <- c(rep("saline", 5), rep("acrolein", 5))
+design <- model.matrix(~0 + condition)
+colnames(design) <- c("acrolein", "saline")
+# Contrast: acrolein relative to saline
+contrast.matrix <- makeContrasts(acrolein_vs_saline = acrolein - saline, levels = design)
+# Run limma
+fit <- lmFit(ACR_dat_bc, design, method="robust", maxit=1000)
+fit <- contrasts.fit(fit, contrast.matrix)
+fit <- eBayes(fit)
+results <- topTable(fit, coef="acrolein_vs_saline", number=Inf, adjust.method="BH")
+results$UniprotID <- rownames(results)
+
+# Volcano plot
+ggplot(results, aes(x = logFC, y = -log10(adj.P.Val))) +
+  geom_point(aes(color = factor(ifelse(adj.P.Val < 0.05 & abs(logFC) > 1, "Significant & FC",
+                                     ifelse(adj.P.Val < 0.05 & abs(logFC) <= 1, "Significant", "NS")))), 
+             alpha = 1, size=0.5) +
+  scale_color_manual(values = c("NS" = "black", 
+                                "Significant & FC" = "red", 
+                                "Significant" = "blue")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") + 
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  labs(x = "Log2FC", 
+       y = "-Log10 Padj", 
+       color = "Legend") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  scale_y_continuous(limits = c(0, 7), expand = c(0, 0))
+#ggsave("ACRvolcano.svg", plot = ACRvolcano, width = 6, height = 4, units = "in")
+
+# Interactive plot to show genes
+plotint <- ggplot(results, aes(x = logFC, y = -log10(adj.P.Val))) +
+  geom_point(aes(
+    color = factor(ifelse(adj.P.Val < 0.05 & abs(logFC) > 1, "Significant & FC",
+                          ifelse(adj.P.Val < 0.05 & abs(logFC) <= 1, "Significant", "NS"))),
+    text = UniprotID
+  ), alpha = 1, size = 0.5) +
+  scale_color_manual(values = c("NS" = "black", 
+                                "Significant & FC" = "red", 
+                                "Significant" = "blue")) +
+  geom_hline(yintercept = -log10(0.05), linetype = "dashed") + 
+  geom_vline(xintercept = c(-1, 1), linetype = "dashed") +
+  labs(x = "Log2FC", 
+       y = "-Log10 Padj", 
+       color = "Legend") +
+  theme_bw() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        aspect.ratio = 1) +
+  scale_y_continuous(limits = c(0, 10), expand = c(0, 0))
+
+plotly::ggplotly(plotint, tooltip = "text")
+
+ACR_DAP <- results
+ACR_DAP <- merge(ACR_UniprotNames, ACR_DAP, by = "UniprotID", all = TRUE)
+#write.csv(ACR_DAP, "ACR_DAP.csv", row.names = FALSE)
+```
+
+```{r File Exporting}
+# Prepare SCI and ACR information with p adj and log2FC filters to compare genes with SCI and ACR
+ACR_DAPpfilt <- ACR_DAP %>% filter(adj.P.Val < 0.05)
+ACR_DAPpfiltlog2FC <- ACR_DAPpfilt %>%  filter(abs(logFC) > 1)
+
+SCI_DAPpfilt <- SCI_DAP %>% filter(adj.P.Val < 0.05)
+SCI_DAPpfiltlog2FC <- SCI_DAPpfilt %>%  filter(abs(logFC) > 1)
+
+#write.csv(ACR_DAPpfilt, "ACR_DAPpfilt.csv")
+#write.csv(ACR_DAPpfiltlog2FC, "ACR_DAPpfiltlog2FC.csv")
+#write.csv(SCI_DAPpfilt, "SCI_DAPpfilt.csv")
+#write.csv(SCI_DAPpfiltlog2FC, "SCI_DAPpfiltlog2FC.csv")
+```
+
+```{r Save Processed File}
+# Prepare protein and uniprotID list conversion
+protein_list <- ACR_dat_imp1_norm[c("UniprotID", "Protein")]
+# Merge data with respective label
+ACR_dat_bc_label <- merge(results, protein_list, by = "UniprotID", all = TRUE)
+# Move Protein label after UniprotID
+ACR_dat_bc_label <- ACR_dat_bc_label %>% 
+  relocate(Protein, .after = UniprotID)
+```
+
+# 7. HIERARCHICAL CLUSTERING ANALYSIS VIA HEATMAP FOR ACROLEIN
+```{r Heatmap Figure - Overall}
+# Data cleaning for heatmap preparation
+ACR_dat_heatmap <- ACR_dat_bc
+# Transpose to perform z-score normalization
+ACR_dat_heatmap_t <- as.data.frame(t(ACR_dat_heatmap))
+# Function to calculate z-score for a vector
+calc_z_score <- function(x) {
+  (x - mean(x)) / sd(x)
+}
+# Loop through each column and apply the z-score transformation
+for (i in 1:ncol(ACR_dat_heatmap_t)) {
+  ACR_dat_heatmap_t[,i] <- calc_z_score(ACR_dat_heatmap_t[,i])
+}
+# Revert to original transpose
+ACR_dat_heatmap <- as.data.frame(t(ACR_dat_heatmap_t))
+# Reorder the heatmap with SCI and SHAM ordering
+ACR_dat_heatmap <-ACR_dat_heatmap[, c("saline_1", "saline_2", "saline_3", "saline_4", "saline_5", "acrolein_1", "acrolein_2", "acrolein_3", "acrolein_4", "acrolein_5")]
+
+ACR_dat_heatmap <- as.matrix(ACR_dat_heatmap)
+
+# Generate the heat map
+pheatmap(ACR_dat_heatmap,
+  cluster_rows = TRUE,
+  cluster_cols = FALSE,
+  color = colorRampPalette(c("#2166ac", "white", "#b2182b"))(1000),
+  border_color = NA,
+  breaks = seq(-3, 3, length.out = 1000),
+  angle_col = "90",
+  fontsize_col = 3,
+  fontsize_row = 3,
+  show_colnames = TRUE,
+  show_rownames = FALSE)
+```
+
+```{r Heatmap Figure - Significant Proteins 1}
+# Move rownames to the first column
+ACR_dat_bc2 <- rownames_to_column(ACR_dat_bc, var = "UniprotID")
+# Merge the samples data with the statistics from limma
+ACR_dat_bc_merge <- merge(ACR_dat_bc_label, ACR_dat_bc2, by = "UniprotID", all = TRUE)
+# Reorder columns such that samples are after the Protein name column
+ACR_dat_list_stats <- ACR_dat_bc_merge %>%
+  relocate(all_of(colnames(ACR_dat_bc_merge)[9:18]), .after = Protein) 
+
+# Prepare new variable name for the heatmap
+ACR_dat_heatmap_filt <- ACR_dat_list_stats
+# Replace samples with the z-score values
+ACR_dat_heatmap_filt[,3:12] <- ACR_dat_heatmap
+# Filter the data by p adj < 0.05 ad logFC > |1|
+ACR_dat_heatmap_filt2 <- ACR_dat_heatmap_filt %>%
+  filter(adj.P.Val < 0.05, abs(logFC) > 1)
+
+# Organize presented order of the variables in the heatmap
+ACR_dat_heatmap_plot2 <- ACR_dat_heatmap_filt2[, c("UniprotID", "acrolein_1", "acrolein_2", "acrolein_3", "acrolein_4", "acrolein_5", "saline_1", "saline_2", "saline_3", "saline_4", "saline_5")]
+ACR_dat_heatmap_plot2 <- ACR_dat_heatmap_plot2 %>%
+  column_to_rownames(var = colnames(ACR_dat_heatmap_plot2)[1])
+
+ACR_dat_heatmap_plot2 <- as.matrix(ACR_dat_heatmap_plot2)
+
+# Generate the heat map
+pheatmap(ACR_dat_heatmap_plot2,
+  cluster_rows = TRUE,
+  cluster_cols = FALSE,
+  color = colorRampPalette(c("#2166ac", "white", "#b2182b"))(1000),
+  border_color = NA,
+  breaks = seq(-3, 3, length.out = 1000),
+  angle_col = "90",
+  fontsize_col = 3,
+  fontsize_row = 3,
+  show_colnames = TRUE,
+  show_rownames = TRUE)
+#ggsave("ACRheatmap.svg", plot = ACRheatmap, width = 6, height = 4, units = "in")
+
+# Saving the filtered list of significant and log2FC list of proteins
+#write.xlsx(ACR_dat_heatmap_filt2, "STRINGDB_ACR_dat_heatmap_filt2.xlsx", rownames=TRUE)
+```
+
+# 8. GENE SET ENRICHMENT ANALYSIS SCI
+```{r Rat Protein to Gene Mapping}
+# Create separate data frame copy for the GSEA protein-to-gene mapping
+SCI_gsea_dat_list_stats <- SCI_dat_list_stats
+# Protein to gene mapping (rat gene symbol)
+SCI_gsea_dat_list_stats$GeneID <- mapIds(
+  org.Rn.eg.db, 
+  keys = SCI_gsea_dat_list_stats$UniprotID, 
+  column = "SYMBOL", 
+  keytype = "UNIPROT", 
+  multiVals = "first"
+)
+# Move GeneID column after UniprotID column
+SCI_gsea_dat_list_stats <- SCI_gsea_dat_list_stats %>% 
+  relocate(GeneID, .after = UniprotID)
+# Remove NA values
+SCI_gsea_dat_list_stats_filt <- SCI_gsea_dat_list_stats[!is.na(SCI_gsea_dat_list_stats$GeneID), ]
+
+SCI_gsea_dat_list_stats_filt <- SCI_gsea_dat_list_stats_filt[
+  !SCI_gsea_dat_list_stats_filt$GeneID %in% 
+    SCI_gsea_dat_list_stats_filt$GeneID[duplicated(SCI_gsea_dat_list_stats_filt$GeneID) | 
+                                         duplicated(SCI_gsea_dat_list_stats_filt$GeneID, fromLast = TRUE)],
+  ]
+
+# Save file as XLSX
+#write.xlsx(SCI_gsea_dat_list_stats_filt, "SCI_gsea_dat_list_stats_filt.xlsx")
+```
+
+```{r GSEA Reactome}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_REACTOME_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "C2", subcollection = "CP:REACTOME"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- SCI_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_REACTOME_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+SCI_gsea_results_list_reactome <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(SCI_gsea_results_list_reactome, "SCI_GSEA_Reactome_proteomics.xlsx")
+```
+
+```{r GSEA Hallmark}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_HALLMARK_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "H"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- SCI_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_HALLMARK_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+SCI_gsea_results_list_hallmark <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(SCI_gsea_results_list_hallmark, "SCI_GSEA_Hallmark_proteomics.xlsx")
+```
+
+```{r GSEA KEGG}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_KEGG_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "C2"
+                       )
+rn_KEGG_sets <- rn_KEGG_sets[grepl("CP:KEGG_LEGACY", rn_KEGG_sets$gs_subcollection), ]
+
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- SCI_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_KEGG_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+SCI_gsea_results_list_kegg <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(SCI_gsea_results_list_kegg, "SCI_GSEA_Kegg_proteomics.xlsx")
+```
+
+```{r GSEA GOBP}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_GOBP_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "C5", subcollection = "GO:BP"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- SCI_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_GOBP_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+SCI_gsea_results_list_gobp <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(SCI_gsea_results_list_gobp, "SCI_GSEA_GOBP_proteomics.xlsx")
+```
+
+# 9 GENE SET ENRICHMENT ANALYSIS ACROLEIN
+```{r Rat Protein to Gene Mapping}
+# Create separate data frame copy for the GSEA protein-to-gene mapping
+ACR_gsea_dat_list_stats <- ACR_dat_list_stats
+# Protein to gene mapping (rat gene symbol)
+ACR_gsea_dat_list_stats$GeneID <- mapIds(
+  org.Rn.eg.db, 
+  keys = ACR_gsea_dat_list_stats$UniprotID, 
+  column = "SYMBOL", 
+  keytype = "UNIPROT", 
+  multiVals = "first"
+)
+# Move GeneID column after UniprotID column
+ACR_gsea_dat_list_stats <- ACR_gsea_dat_list_stats %>% 
+  relocate(GeneID, .after = UniprotID)
+# Remove NA values
+ACR_gsea_dat_list_stats_filt <- ACR_gsea_dat_list_stats[!is.na(ACR_gsea_dat_list_stats$GeneID), ]
+
+ACR_gsea_dat_list_stats_filt <- ACR_gsea_dat_list_stats_filt[
+  !ACR_gsea_dat_list_stats_filt$GeneID %in% 
+    ACR_gsea_dat_list_stats_filt$GeneID[duplicated(ACR_gsea_dat_list_stats_filt$GeneID) | 
+                                         duplicated(ACR_gsea_dat_list_stats_filt$GeneID, fromLast = TRUE)],
+  ]
+
+# Save file as XLSX
+#write.xlsx(ACR_gsea_dat_list_stats_filt, "ACR_gsea_dat_list_stats_filt.xlsx")
+```
+
+```{r GSEA Reactome}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_REACTOME_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "C2", subcollection = "CP:REACTOME"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- ACR_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_REACTOME_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+ACR_gsea_results_list_reactome <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(ACR_gsea_results_list_reactome, "ACR_GSEA_Reactome_proteomics.xlsx")
+```
+
+```{r GSEA Hallmark}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_HALLMARK_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "H"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- ACR_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_HALLMARK_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+ACR_gsea_results_list_hallmark <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(ACR_gsea_results_list_hallmark, "ACR_GSEA_Hallmark_proteomics.xlsx")
+```
+
+```{r GSEA KEGG}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_KEGG_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "C2"
+                       )
+rn_KEGG_sets <- rn_KEGG_sets[grepl("CP:KEGG_LEGACY", rn_KEGG_sets$gs_subcollection), ]
+
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- ACR_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_KEGG_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+ACR_gsea_results_list_kegg <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(ACR_gsea_results_list_kegg, "ACR_GSEA_Kegg_proteomics.xlsx")
+```
+
+```{r GSEA GOBP}
+# SET THE DESIRED ORGANISM HERE
+organism <- "org.Rn.eg.db"
+# Prepare the dataset to be used for GSEA
+rn_GOBP_sets <- msigdbr(species = "Rattus norvegicus",
+                        collection = "C5", subcollection = "GO:BP"
+                       )
+# Create list for data storage
+gsea_results_list <- list()  # List to store results
+# Extract gene names and log2FC values from the dataset
+gene_list <- ACR_gsea_dat_list_stats_filt[, c("GeneID", "logFC")]
+# Sort gene list by log2FC values (descending order)
+gene_list <- gene_list %>% arrange(desc(logFC))
+# Extract the log2FC values for GSEA analysis
+prerank_gene_list <- gene_list$logFC
+# Set gene names as the names of the gene list
+names(prerank_gene_list) <- gene_list$GeneID
+# Run the GSEA analysis
+gsea_results <- GSEA(
+    geneList = prerank_gene_list,
+    minGSSize = 5, 
+    maxGSSize = 500, 
+    pvalueCutoff = 0.2,  # Higher cutoff for visualization, but not all used
+    eps = 0, 
+    seed = TRUE, 
+    pAdjustMethod = "BH",  # Benjamini-Hochberg correction factor
+    TERM2GENE = dplyr::select(rn_GOBP_sets, gs_name, gene_symbol)
+                    )
+# Store GSEA results in the list with the PC column name as the key
+ACR_gsea_results_list_gobp <- data.frame(gsea_results@result)
+# Save file as XLSX
+#write.xlsx(ACR_gsea_results_list_gobp, "ACR_GSEA_GOBP_proteomics.xlsx")
+```
+
+
+```{r}
+KEGG_SCI_NES <- SCI_gsea_results_list_kegg
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+KEGG_SCI_NES <- KEGG_SCI_NES[with(KEGG_SCI_NES , !((p.adjust >= 0.05))), ]
+KEGG_SCI_NES <- KEGG_SCI_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(KEGG_SCI_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(KEGG_SCI_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaKEGG_met.svg", plot = gseaKEGG_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+KEGG_ACR_NES <- ACR_gsea_results_list_kegg
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+KEGG_ACR_NES <- KEGG_ACR_NES[with(KEGG_ACR_NES , !((p.adjust >= 0.05))), ]
+KEGG_ACR_NES <- KEGG_ACR_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(KEGG_ACR_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(KEGG_ACR_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaKEGG_met.svg", plot = gseaKEGG_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+# Label the NES for primary and metastatic groups
+KEGG_SCI_NES_list <- KEGG_SCI_NES[c("ID", "NES")]
+colnames(KEGG_SCI_NES_list)[2] <- "NES_SCI"
+
+KEGG_ACR_NES_list <- KEGG_ACR_NES[c("ID", "NES")]
+colnames(KEGG_ACR_NES_list)[2] <- "NES_ACR"
+
+
+KEGG_NES_SCI_ACR <- merge(KEGG_SCI_NES_list, KEGG_ACR_NES_list, by = "ID", all = FALSE)
+
+ggplot(KEGG_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+#ggsave("gseaKEGG_SCI_ACR.svg", plot = gseaKEGG_SCI_ACR, width = 6, height = 4, units = "in")
+#write.xlsx(KEGG_NES_SCI_ACR, "KEGG_NES_SCI_ACR.xlsx")
+
+plotint <- ggplot(KEGG_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+plotly::ggplotly(plotint, tooltip = "text")
+```
+
+```{r}
+HALLMARK_SCI_NES <- SCI_gsea_results_list_hallmark
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+HALLMARK_SCI_NES <- HALLMARK_SCI_NES[with(HALLMARK_SCI_NES , !((p.adjust >= 0.05))), ]
+HALLMARK_SCI_NES <- HALLMARK_SCI_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(HALLMARK_SCI_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(HALLMARK_SCI_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaHALLMARK_met.svg", plot = gseaHALLMARK_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+HALLMARK_ACR_NES <- ACR_gsea_results_list_hallmark
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+HALLMARK_ACR_NES <- HALLMARK_ACR_NES[with(HALLMARK_ACR_NES , !((p.adjust >= 0.05))), ]
+HALLMARK_ACR_NES <- HALLMARK_ACR_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(HALLMARK_ACR_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(HALLMARK_ACR_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaHALLMARK_met.svg", plot = gseaHALLMARK_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+# Label the NES for primary and metastatic groups
+HALLMARK_SCI_NES_list <- HALLMARK_SCI_NES[c("ID", "NES")]
+colnames(HALLMARK_SCI_NES_list)[2] <- "NES_SCI"
+
+HALLMARK_ACR_NES_list <- HALLMARK_ACR_NES[c("ID", "NES")]
+colnames(HALLMARK_ACR_NES_list)[2] <- "NES_ACR"
+
+
+HALLMARK_NES_SCI_ACR <- merge(HALLMARK_SCI_NES_list, HALLMARK_ACR_NES_list, by = "ID", all = FALSE)
+
+ggplot(HALLMARK_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+#ggsave("gseaHALLMARK_SCI_ACR.svg", plot = gseaHALLMARK_SCI_ACR, width = 6, height = 4, units = "in")
+#write.xlsx(HALLMARK_NES_SCI_ACR, "HALLMARK_NES_SCI_ACR.xlsx")
+
+plotint <- ggplot(HALLMARK_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+plotly::ggplotly(plotint, tooltip = "text")
+```
+
+```{r}
+REACTOME_SCI_NES <- SCI_gsea_results_list_reactome
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+REACTOME_SCI_NES <- REACTOME_SCI_NES[with(REACTOME_SCI_NES , !((p.adjust >= 0.05))), ]
+REACTOME_SCI_NES <- REACTOME_SCI_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(REACTOME_SCI_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(REACTOME_SCI_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaREACTOME_met.svg", plot = gseaREACTOME_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+REACTOME_ACR_NES <- ACR_gsea_results_list_reactome
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+REACTOME_ACR_NES <- REACTOME_ACR_NES[with(REACTOME_ACR_NES , !((p.adjust >= 0.05))), ]
+REACTOME_ACR_NES <- REACTOME_ACR_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(REACTOME_ACR_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(REACTOME_ACR_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaREACTOME_met.svg", plot = gseaREACTOME_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+# Label the NES for primary and metastatic groups
+REACTOME_SCI_NES_list <- REACTOME_SCI_NES[c("ID", "NES")]
+colnames(REACTOME_SCI_NES_list)[2] <- "NES_SCI"
+
+REACTOME_ACR_NES_list <- REACTOME_ACR_NES[c("ID", "NES")]
+colnames(REACTOME_ACR_NES_list)[2] <- "NES_ACR"
+
+
+REACTOME_NES_SCI_ACR <- merge(REACTOME_SCI_NES_list, REACTOME_ACR_NES_list, by = "ID", all = FALSE)
+
+ggplot(REACTOME_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+#ggsave("gseaREACTOME_SCI_ACR.svg", plot = gseaREACTOME_SCI_ACR, width = 6, height = 4, units = "in")
+#write.xlsx(REACTOME_NES_SCI_ACR, "REACTOME_NES_SCI_ACR.xlsx")
+
+plotint <- ggplot(REACTOME_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+plotly::ggplotly(plotint, tooltip = "text")
+```
+
+```{r}
+ggplot(REACTOME_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  ) + ylim(2,3) + xlim(2,3)
+#ggsave("gseaREACTOMEzoomed_SCI_ACR.svg", plot = gseaREACTOMEzoomed_SCI_ACR, width = 6, height = 4, units = "in")
+
+plotint <- ggplot(REACTOME_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  ) + ylim(2,3) + xlim(2,3)
+plotly::ggplotly(plotint, tooltip = "text")
+```
+
+```{r}
+GOBP_SCI_NES <- SCI_gsea_results_list_gobp
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+GOBP_SCI_NES <- GOBP_SCI_NES[with(GOBP_SCI_NES , !((p.adjust >= 0.05))), ]
+GOBP_SCI_NES <- GOBP_SCI_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(GOBP_SCI_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(GOBP_SCI_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaGOBP_met.svg", plot = gseaGOBP_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+GOBP_ACR_NES <- ACR_gsea_results_list_gobp
+
+# Remove the Data Below FDR of 0.05 (0.05 is considered the level of significance)
+GOBP_ACR_NES <- GOBP_ACR_NES[with(GOBP_ACR_NES , !((p.adjust >= 0.05))), ]
+GOBP_ACR_NES <- GOBP_ACR_NES %>% mutate(sign = NES <= 0)
+
+# Adjust the positions on the bar chart to display bars from lowest NES value to largest value
+arranged_position <- arrange(GOBP_ACR_NES, desc(NES))
+# Pull out the positions for the enrichment plot
+positions <- arranged_position$Description
+
+# Creating the horizontal bar plots
+ggplot(GOBP_ACR_NES) +
+  geom_col(aes(x = NES, y = Description, fill=sign), colour = "black", width = 0.9, alpha = 1) + 
+  ylab(NULL) + xlab("Normalized Enrichment Score") + theme_minimal() + 
+  theme(legend.position = "none", text=element_text(color="black", size = 2), 
+        axis.text = element_text(color = "black", size=10)) + theme_classic() + 
+geom_vline(xintercept = 0, color = "black", linetype = "solid", linewidth = 1.5) +
+  xlim(c(-4.5,4.5)) + scale_y_discrete(limits = positions) + scale_fill_manual(values = c("royalblue", "royalblue"))
+#ggsave("gseaGOBP_met.svg", plot = gseaGOBP_met, width = 6, height = 4, units = "in")
+```
+
+```{r}
+# Label the NES for primary and metastatic groups
+GOBP_SCI_NES_list <- GOBP_SCI_NES[c("ID", "NES")]
+colnames(GOBP_SCI_NES_list)[2] <- "NES_SCI"
+
+GOBP_ACR_NES_list <- GOBP_ACR_NES[c("ID", "NES")]
+colnames(GOBP_ACR_NES_list)[2] <- "NES_ACR"
+
+
+GOBP_NES_SCI_ACR <- merge(GOBP_SCI_NES_list, GOBP_ACR_NES_list, by = "ID", all = FALSE)
+
+ggplot(GOBP_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+#ggsave("gseaGOBP_SCI_ACR.svg", plot = gseaGOBP_SCI_ACR, width = 6, height = 4, units = "in")
+#write.xlsx(GOBP_NES_SCI_ACR, "GOBP_NES_SCI_ACR.xlsx")
+
+plotint <- ggplot(GOBP_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  )
+plotly::ggplotly(plotint, tooltip = "text")
+```
+
+```{r}
+ggplot(GOBP_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  ) + ylim(2,3) + xlim(2,3)
+#ggsave("gseaGOBPzoomed_SCI_ACR.svg", plot = gseaGOBPzoomed_SCI_ACR, width = 6, height = 4, units = "in")
+
+plotint <- ggplot(GOBP_NES_SCI_ACR, aes(x = NES_SCI, y = NES_ACR, text=ID)) +
+  geom_point(shape = 16, size = 1.5, color = "navy") + 
+  coord_equal() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),  # Remove major gridlines
+    panel.grid.minor = element_blank(),   # Remove minor gridlines
+    aspect.ratio = 1
+  ) + ylim(2,3) + xlim(2,3)
+plotly::ggplotly(plotint, tooltip = "text")
+```
+
+
+
+
+# 10 PATHVIEW ANALYSIS
+```{r KEGG Pathview}
+library("pathview")
+# Extract gene symbols and logFC
+gene_symbols <- SCI_gsea_dat_list_stats_filt$GeneID
+logfc_values <- SCI_gsea_dat_list_stats_filt$logFC
+
+# Convert symbols to Entrez IDs
+entrez_ids <- mapIds(org.Rn.eg.db,
+                     keys = gene_symbols,
+                     column = "ENTREZID",
+                     keytype = "SYMBOL",
+                     multiVals = "first")
+# Prepare data for pathview
+gene.data <- logfc_values
+names(gene.data) <- entrez_ids
+# Remove NAs
+gene.data <- gene.data[!is.na(names(gene.data))]
+# Pathview analysis for rattus norvegicus
+pv.out <- pathview(gene.data  = gene.data,
+                   pathway.id = "rno04610",
+                   species    = "rno",
+                   out.suffix = "SCI_vs_Sham",
+                   kegg.native = TRUE,      
+                   low = list(gene = "#2166ac"),   
+                   mid = list(gene = "white"),  
+                   high = list(gene = "#b2182b"),
+                   limit = list(gene = c(-3, 3)),
+                   bins = list(gene = 50))
+```
+
+```{r Acrolein Pathview}
+# Extract gene symbols and logFC
+gene_symbols <- ACR_gsea_dat_list_stats_filt$GeneID
+logfc_values <- ACR_gsea_dat_list_stats_filt$logFC
+
+# Convert symbols to Entrez IDs
+entrez_ids <- mapIds(org.Rn.eg.db,
+                     keys = gene_symbols,
+                     column = "ENTREZID",
+                     keytype = "SYMBOL",
+                     multiVals = "first")
+
+# Prepare data for pathview
+gene.data <- logfc_values
+names(gene.data) <- entrez_ids
+# Remove NAs 
+gene.data <- gene.data[!is.na(names(gene.data))]
+# Pathview analysis
+pv.out <- pathview(gene.data  = gene.data,
+                   pathway.id = "rno04610",
+                   species    = "rno",
+                   out.suffix = "ACR_vs_Saline",
+                   kegg.native = TRUE,      
+                   low = list(gene = "#2166ac"),   
+                   mid = list(gene = "white"),  
+                   high = list(gene = "#b2182b"),
+                   limit = list(gene = c(-3, 3)),
+                   bins = list(gene = 50))
+```
+
+
+
+
+********************** END OF SCRIPT **********************
+
